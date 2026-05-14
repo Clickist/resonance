@@ -562,26 +562,33 @@ section { position: relative; }
 .tl-axis__year::before {
   content: "";
   position: absolute;
-  left: -8px; top: -4px;
+  left: -8px;
+  top: 50%;
+  transform: translateY(-50%);
   width: 9px; height: 9px;
   border-radius: 50%;
-  background: var(--canvas);
-  border: 1px solid var(--hairline);
-  transition: background .25s ease, border-color .25s ease, transform .25s ease;
+  background: var(--primary);
+  opacity: 0;
+  transition: opacity .25s ease, transform .25s ease;
 }
 .tl-axis__year.is-active { color: var(--primary); }
 .tl-axis__year.is-active::before {
-  background: var(--primary);
-  border-color: var(--primary);
-  transform: scale(1.25);
+  opacity: 1;
+  transform: translateY(-50%) scale(1.15);
 }
 
+/* min-height locks the card to ~2 lines so 1-line titles don't make
+   the years column above redistribute on every scroll-in. */
 .tl-axis__nowat {
   margin-top: var(--s-lg);
   padding: var(--s-md);
   border: 1px solid var(--hairline);
   border-radius: var(--r-md);
   background: var(--surface-soft);
+  min-height: 100px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 .tl-axis__nowat .lbl {
   font: 500 11px/1 var(--ff-body);
@@ -1353,7 +1360,7 @@ section { position: relative; }
           <!-- year markers injected -->
         </div>
         <div class="tl-axis__nowat" aria-live="polite">
-          <div class="lbl">Reading</div>
+          <div class="lbl">Listening</div>
           <div class="val" id="tl-nowat">2020 · The Apple Music era begins</div>
         </div>
       </aside>
