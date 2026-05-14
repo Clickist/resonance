@@ -886,8 +886,8 @@ section { position: relative; }
   letter-spacing: 0;
   padding: 4px 8px;
   border-radius: var(--r-xs);
-  background: var(--surface-card);
-  color: var(--ink);
+  background: var(--primary);
+  color: var(--on-primary);
 }
 .country-card h3 {
   margin: 0 0 var(--s-sm);
@@ -1213,23 +1213,29 @@ section { position: relative; }
 .hide-on-mobile { }
 @media (max-width: 700px) { .hide-on-mobile { display: none; } }
 
-/* country highlight when active card scrolls into view — globe bubble label */
+/* active country label — bottom-left of the globe card, coral serif.
+   Visual rhyme with the right-side country-card h3 (same display
+   serif scale) so the two read as the same headline at two scales. */
 .globe-label {
   position: absolute;
+  left: var(--s-xl);
+  bottom: var(--s-xl);
   pointer-events: none;
-  padding: 6px 10px;
-  border-radius: var(--r-pill);
-  background: var(--primary);
-  color: var(--on-primary);
-  font: 500 12px/1 var(--ff-body);
-  letter-spacing: 0.5px;
-  transform: translate(-50%, -120%);
-  white-space: nowrap;
+  font-family: var(--ff-display);
+  font-size: clamp(28px, 2.8vw, 38px);
+  line-height: 1.1;
+  letter-spacing: -0.5px;
+  color: var(--primary);
+  max-width: 70%;
   opacity: 0;
-  transition: opacity .3s ease;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+  transform: translateY(8px);
+  transition: opacity .35s ease, transform .35s ease;
+  z-index: 2;
 }
-.globe-label.is-on { opacity: 1; }
+.globe-label.is-on {
+  opacity: 1;
+  transform: none;
+}
 </style>
 </head>
 <body>
@@ -1944,7 +1950,7 @@ let GLOBE_LABEL_EL = null;
   // globe init
   initGlobe();
 
-  // sync card scroll → globe POV
+  // sync card scroll → globe POV + active polygon
   const cards = [...narrative.querySelectorAll('.country-card')];
   const io = new IntersectionObserver(entries => {
     entries.forEach(e => {
@@ -1954,7 +1960,15 @@ let GLOBE_LABEL_EL = null;
         const lng = parseFloat(e.target.dataset.lng);
         const code = e.target.dataset.code;
         const country = DATA.countries.find(c => c.code === code);
-        if (GLOBE) GLOBE.pointOfView({ lat, lng, altitude: 1.8 }, 1100);
+        ACTIVE_COUNTRY_CODE = code;
+        if (GLOBE) {
+          GLOBE.pointOfView({ lat, lng, altitude: 1.8 }, 1100);
+          // Force polygon re-render so the new active country paints coral
+          const gc = getGlobeColors();
+          GLOBE.polygonCapColor(
+            f => featureMatchesCode(f, ACTIVE_COUNTRY_CODE) ? gc.marker : gc.land
+          );
+        }
         GLOBE_LABEL_EL.textContent = country.name;
         GLOBE_LABEL_EL.classList.add('is-on');
       }
@@ -1984,41 +1998,35 @@ function getGlobeColors() {
   };
 }
 
+/* Track the active country code so polygonCapColor knows which
+   polygon to paint coral. Set by the country-card observer. */
+let ACTIVE_COUNTRY_CODE = null;
+function featureMatchesCode(feature, code) {
+  if (!feature || !feature.properties || !code) return false;
+  const p = feature.properties;
+  const iso = (p.ISO_A2 || p.iso_a2 || '').toUpperCase();
+  if (iso === code) return true;
+  // Natural Earth marks some disputed/small entities as -99; fall
+  // back to name match for the ones the report uses.
+  const name = (p.ADMIN || p.NAME || p.name || '').toLowerCase();
+  const codeToName = {
+    TW: 'taiwan',
+    BY: 'belarus',
+    EC: 'ecuador'
+  };
+  return codeToName[code] ? name.includes(codeToName[code]) : false;
+}
+
 function initGlobe() {
   const container = document.getElementById('globe');
   if (!container || typeof Globe === 'undefined') return;
   const colors = getGlobeColors();
 
-  // points dataset — small flat dots, not pillars
-  const points = DATA.countries.map(c => ({
-    lat: c.lat, lng: c.lng,
-    weight: Math.max(1, Math.log2(c.artistCount + 1)),
-    color: colors.marker,
-    name: c.name
-  }));
-
   GLOBE = Globe()(container)
     .backgroundColor('rgba(0,0,0,0)')
     .showAtmosphere(false)
     .showGlobe(true)
-    .globeImageUrl(null)
-    .pointsData(points)
-    .pointLat('lat')
-    .pointLng('lng')
-    .pointAltitude(0.012)
-    .pointRadius(d => 0.5 + d.weight * 0.18)
-    .pointColor('color')
-    .pointResolution(20)
-    .pointsMerge(false)
-    // rings for emphasis
-    .ringsData(points)
-    .ringLat('lat')
-    .ringLng('lng')
-    .ringColor(() => () => `rgba(204,120,92,0.55)`)
-    .ringMaxRadius(d => 2 + d.weight * 0.6)
-    .ringPropagationSpeed(1.4)
-    .ringRepeatPeriod(2200)
-    .ringAltitude(0.012);
+    .globeImageUrl(null);
 
   // try multiple geojson sources for land polygons
   const geoSources = [
@@ -2033,7 +2041,7 @@ function initGlobe() {
         const geo = await r.json();
         GLOBE
           .polygonsData(geo.features)
-          .polygonCapColor(() => colors.land)
+          .polygonCapColor(f => featureMatchesCode(f, ACTIVE_COUNTRY_CODE) ? colors.marker : colors.land)
           .polygonSideColor(() => 'rgba(0,0,0,0)')
           .polygonStrokeColor(() => colors.stroke)
           .polygonAltitude(0.006);
@@ -2073,9 +2081,10 @@ function initGlobe() {
     const c = getGlobeColors();
     GLOBE.globeMaterial().color.set(c.water);
     if (GLOBE.polygonsData && GLOBE.polygonsData().length) {
-      GLOBE.polygonCapColor(() => c.land).polygonStrokeColor(() => c.stroke);
+      GLOBE
+        .polygonCapColor(f => featureMatchesCode(f, ACTIVE_COUNTRY_CODE) ? c.marker : c.land)
+        .polygonStrokeColor(() => c.stroke);
     }
-    GLOBE.pointColor(() => c.marker);
   };
 }
 
