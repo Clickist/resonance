@@ -85,6 +85,8 @@
 
   --shadow-soft:         0 1px 3px rgba(20,20,19,0.06);
   --shadow-card:         0 1px 2px rgba(20,20,19,0.04), 0 8px 32px rgba(20,20,19,0.04);
+  --shadow-active:       0 12px 36px rgba(20,20,19,0.10);
+  --card-active-bg:      var(--surface-soft);
 }
 
 /* ---------- DARK ---------- */
@@ -114,6 +116,8 @@
 
   --shadow-soft:         0 1px 3px rgba(0,0,0,0.40);
   --shadow-card:         0 1px 2px rgba(0,0,0,0.30), 0 8px 32px rgba(0,0,0,0.25);
+  --shadow-active:       0 16px 48px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.05);
+  --card-active-bg:      var(--surface-card);
 }
 
 /* ============================================================
@@ -857,15 +861,15 @@ section { position: relative; }
   border-radius: var(--r-lg);
   border: 1px solid var(--hairline);
   background: var(--canvas);
-  transition: border-color .3s ease, background-color .3s ease, transform .3s ease;
+  transition: background-color .3s ease, transform .3s ease, box-shadow .3s ease;
   min-height: 60vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
 .country-card.is-active {
-  border-color: var(--primary);
-  background: var(--surface-soft);
+  background: var(--card-active-bg);
+  box-shadow: var(--shadow-active);
 }
 .country-card__flag {
   display: inline-flex;
@@ -1959,13 +1963,24 @@ let GLOBE_LABEL_EL = null;
   cards.forEach(c => io.observe(c));
 })();
 
+function hexToRgba(hex, a) {
+  const s = String(hex).trim().replace('#','');
+  const n = s.length === 3 ? s.split('').map(x => x + x).join('') : s;
+  if (n.length !== 6) return `rgba(0,0,0,${a})`;
+  const r = parseInt(n.slice(0,2),16), g = parseInt(n.slice(2,4),16), b = parseInt(n.slice(4,6),16);
+  return `rgba(${r},${g},${b},${a})`;
+}
 function getGlobeColors() {
   const cs = getComputedStyle(document.documentElement);
+  const water = cs.getPropertyValue('--globe-water').trim();
   return {
-    water:    cs.getPropertyValue('--globe-water').trim(),
-    land:     cs.getPropertyValue('--globe-land').trim(),
-    marker:   cs.getPropertyValue('--globe-marker').trim(),
-    atmosphere: cs.getPropertyValue('--globe-atmosphere').trim()
+    water,
+    land:       cs.getPropertyValue('--globe-land').trim(),
+    marker:     cs.getPropertyValue('--globe-marker').trim(),
+    atmosphere: cs.getPropertyValue('--globe-atmosphere').trim(),
+    // country borders: tinted with the water color so the lines read
+    // as "space between countries" rather than as ink overlay.
+    stroke:     hexToRgba(water, 0.55)
   };
 }
 
@@ -2022,7 +2037,7 @@ function initGlobe() {
           .polygonsData(geo.features)
           .polygonCapColor(() => colors.land)
           .polygonSideColor(() => 'rgba(0,0,0,0)')
-          .polygonStrokeColor(() => 'rgba(0,0,0,0)')
+          .polygonStrokeColor(() => colors.stroke)
           .polygonAltitude(0.006);
         return;
       } catch (e) {}
@@ -2061,7 +2076,7 @@ function initGlobe() {
     GLOBE.globeMaterial().color.set(c.water);
     GLOBE.atmosphereColor(c.atmosphere);
     if (GLOBE.polygonsData && GLOBE.polygonsData().length) {
-      GLOBE.polygonCapColor(() => c.land);
+      GLOBE.polygonCapColor(() => c.land).polygonStrokeColor(() => c.stroke);
     }
     GLOBE.pointColor(() => c.marker);
   };
