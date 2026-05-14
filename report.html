@@ -58,13 +58,14 @@
 }
 
 /* ---------- LIGHT (default + system light) ---------- */
+/* Cream stack shifted one step warmer (Anthropic wordmark-plate cream). */
 [data-theme="light"] {
-  --canvas:              #faf9f5;
-  --surface-soft:        #f5f0e8;
-  --surface-card:        #efe9de;
-  --surface-cream-strong:#e8e0d2;
-  --hairline:            #e6dfd8;
-  --hairline-soft:       #ebe6df;
+  --canvas:              #f5f0e8;
+  --surface-soft:        #efe9de;
+  --surface-card:        #e8e0d2;
+  --surface-cream-strong:#ddd3c1;
+  --hairline:            #ddd3c1;
+  --hairline-soft:       #e6dccd;
 
   --ink:                 #141413;
   --body-strong:         #252523;
@@ -77,7 +78,7 @@
   --code-fg:             #faf9f5;
   --code-fg-soft:        #a09d96;
 
-  --globe-water:         #f5f0e8;
+  --globe-water:         #efe9de;
   --globe-land:          #181715;
   --globe-marker:        #cc785c;
   --globe-atmosphere:    #cc785c;
@@ -308,30 +309,35 @@ section { position: relative; }
 }
 .hero__grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.95fr);
   gap: var(--s-xxl);
   align-items: center;
 }
 @media (max-width: 900px) {
   .hero__grid { grid-template-columns: 1fr; gap: var(--s-xl); }
 }
+.hero__lead { display: flex; flex-direction: column; }
 .hero h1 {
   margin: 0 0 var(--s-lg);
-  max-width: 16ch;
+  max-width: 17ch;
 }
-.hero p.t-body-lead { margin: 0 0 var(--s-lg); max-width: 36ch; }
-.hero .meta-strip {
-  display: flex;
-  flex-wrap: wrap;
+.hero p.t-body-lead { margin: 0; max-width: 38ch; }
+
+.meta-strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: var(--s-md) var(--s-xl);
-  margin-top: var(--s-xl);
+  margin-top: var(--s-xxl);
   padding-top: var(--s-xl);
   border-top: 1px solid var(--hairline);
+}
+@media (max-width: 700px) {
+  .meta-strip { grid-template-columns: repeat(2, 1fr); }
 }
 .meta-strip .stat { display: flex; flex-direction: column; gap: var(--s-xxs); }
 .meta-strip .stat .num {
   font-family: var(--ff-display);
-  font-size: 32px;
+  font-size: 36px;
   line-height: 1;
   color: var(--ink);
   letter-spacing: -0.6px;
@@ -353,11 +359,6 @@ section { position: relative; }
   overflow: hidden;
   box-shadow: var(--shadow-card);
 }
-.now-card__rail {
-  position: absolute; inset: 0 0 0 0;
-  pointer-events: none;
-  background: radial-gradient(120% 80% at 100% 0%, color-mix(in srgb, var(--primary) 16%, transparent) 0%, transparent 60%);
-}
 .now-card .label {
   position: relative;
   display: inline-flex;
@@ -373,12 +374,6 @@ section { position: relative; }
   content: "";
   width: 6px; height: 6px; border-radius: 50%;
   background: var(--primary);
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 16%, transparent);
-  animation: pulse 2.4s ease-in-out infinite;
-}
-@keyframes pulse {
-  0%,100% { box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 18%, transparent); }
-  50%     { box-shadow: 0 0 0 9px color-mix(in srgb, var(--primary) 6%, transparent); }
 }
 .now-card .track-name {
   position: relative;
@@ -1250,46 +1245,46 @@ section { position: relative; }
      S1 — HERO
      ============================================================ -->
 <section id="hero" class="hero">
-  <div class="container hero__grid">
-    <div>
-      <div class="eyebrow reveal">An editorial reading of an Apple Music library</div>
-      <h1 class="t-display-xl reveal delay-1">Your play count is a diary you never meant to publish.</h1>
-      <p class="t-body-lead reveal delay-2">
-        No stars. No hearts. Only the quiet arithmetic of how many times you came back to a song —
-        and how many you brought home and never opened again.
-      </p>
-
-      <div class="meta-strip reveal delay-3">
-        <div class="stat">
-          <span class="num" id="stat-tracks">901</span>
-          <span class="lbl">tracks in library</span>
-        </div>
-        <div class="stat">
-          <span class="num" id="stat-plays">6,376</span>
-          <span class="lbl">total plays</span>
-        </div>
-        <div class="stat">
-          <span class="num" id="stat-artists">300</span>
-          <span class="lbl">distinct artists</span>
-        </div>
-        <div class="stat">
-          <span class="num" id="stat-span">5y 6m</span>
-          <span class="lbl">span on record</span>
-        </div>
+  <div class="container">
+    <div class="hero__grid">
+      <div class="hero__lead">
+        <h1 class="t-display-xl reveal">Your play count is a diary you never meant to publish.</h1>
+        <p class="t-body-lead reveal delay-1">
+          No stars. No hearts. Only the quiet arithmetic of how many times you came back to a song —
+          and how many you brought home and never opened again.
+        </p>
       </div>
+
+      <aside class="now-card reveal delay-1" aria-label="Most recently added">
+        <div class="label">Most recently added</div>
+        <h2 class="track-name" id="recent-name">Chamber of Reflection</h2>
+        <p class="track-artist" id="recent-artist">Mac DeMarco</p>
+        <p class="footnote">
+          Added <em id="recent-when">May 2026</em>. Right before it: <em>Save the Day</em> by SZA,
+          and a 26-track plunge into <em>Nujabes</em> — a Japanese producer who has been gone since 2010.
+          The line you’re tracing right now leans inward.
+        </p>
+      </aside>
     </div>
 
-    <aside class="now-card reveal delay-2" aria-label="Most recently added">
-      <div class="now-card__rail" aria-hidden="true"></div>
-      <div class="label">Most recently added</div>
-      <h2 class="track-name" id="recent-name">Chamber of Reflection</h2>
-      <p class="track-artist" id="recent-artist">Mac DeMarco</p>
-      <p class="footnote">
-        Added <em id="recent-when">May 2026</em>. Right before it: <em>Save the Day</em> by SZA,
-        and a 26-track plunge into <em>Nujabes</em> — a Japanese producer who has been gone since 2010.
-        The line you’re tracing right now leans inward.
-      </p>
-    </aside>
+    <div class="meta-strip reveal delay-2">
+      <div class="stat">
+        <span class="num" id="stat-tracks">901</span>
+        <span class="lbl">tracks in library</span>
+      </div>
+      <div class="stat">
+        <span class="num" id="stat-plays">6,376</span>
+        <span class="lbl">total plays</span>
+      </div>
+      <div class="stat">
+        <span class="num" id="stat-artists">300</span>
+        <span class="lbl">distinct artists</span>
+      </div>
+      <div class="stat">
+        <span class="num" id="stat-span">5y 6m</span>
+        <span class="lbl">span on record</span>
+      </div>
+    </div>
   </div>
 </section>
 
