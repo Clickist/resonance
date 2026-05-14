@@ -1,0 +1,2223 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>The Library — A Listening Profile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+/* ============================================================
+   TOKENS — sourced from claude_design/DESIGN.md
+   Light mode = the canonical Anthropic Claude marketing surface.
+   Dark mode  = the canonical Anthropic Claude dark product surface
+                (the same one used for code-window-card, footer,
+                cta-band-dark) promoted to the page floor.
+   No fourth surface tone is introduced. Coral stays coral in
+   both modes — "the coral is the brand voltage".
+   ============================================================ */
+
+:root {
+  /* coral primary (constant across modes) */
+  --primary:           #cc785c;
+  --primary-active:    #a9583e;
+  --primary-disabled:  #e6dfd8;
+  --on-primary:        #ffffff;
+
+  /* accents */
+  --accent-teal:       #5db8a6;
+  --accent-amber:      #e8a55a;
+  --success:           #5db872;
+  --warning:           #d4a017;
+  --error:             #c64545;
+
+  /* radius */
+  --r-xs:   4px;
+  --r-sm:   6px;
+  --r-md:   8px;
+  --r-lg:  12px;
+  --r-xl:  16px;
+  --r-pill: 9999px;
+
+  /* spacing */
+  --s-xxs:  4px;
+  --s-xs:   8px;
+  --s-sm:  12px;
+  --s-md:  16px;
+  --s-lg:  24px;
+  --s-xl:  32px;
+  --s-xxl: 48px;
+  --s-sec: 96px;
+
+  /* type */
+  --ff-display: "EB Garamond", "Tiempos Headline", Garamond, "Times New Roman", serif;
+  --ff-body:    "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --ff-code:    "JetBrains Mono", ui-monospace, monospace;
+}
+
+/* ---------- LIGHT (default + system light) ---------- */
+[data-theme="light"] {
+  --canvas:              #faf9f5;
+  --surface-soft:        #f5f0e8;
+  --surface-card:        #efe9de;
+  --surface-cream-strong:#e8e0d2;
+  --hairline:            #e6dfd8;
+  --hairline-soft:       #ebe6df;
+
+  --ink:                 #141413;
+  --body-strong:         #252523;
+  --body:                #3d3d3a;
+  --muted:               #6c6a64;
+  --muted-soft:          #8e8b82;
+
+  --code-bg:             #181715;
+  --code-bg-soft:        #1f1e1b;
+  --code-fg:             #faf9f5;
+  --code-fg-soft:        #a09d96;
+
+  --globe-water:         #f5f0e8;
+  --globe-land:          #181715;
+  --globe-marker:        #cc785c;
+  --globe-atmosphere:    #cc785c;
+
+  --shadow-soft:         0 1px 3px rgba(20,20,19,0.06);
+  --shadow-card:         0 1px 2px rgba(20,20,19,0.04), 0 8px 32px rgba(20,20,19,0.04);
+}
+
+/* ---------- DARK ---------- */
+[data-theme="dark"] {
+  --canvas:              #181715;
+  --surface-soft:        #1f1e1b;
+  --surface-card:        #252320;
+  --surface-cream-strong:#2d2a26;
+  --hairline:            rgba(160,157,150,0.18);
+  --hairline-soft:       rgba(160,157,150,0.10);
+
+  --ink:                 #faf9f5;
+  --body-strong:         #ebe6df;
+  --body:                #d8d4cb;
+  --muted:               #a09d96;
+  --muted-soft:          #8e8b82;
+
+  --code-bg:             #0f0e0c;
+  --code-bg-soft:        #1a1816;
+  --code-fg:             #faf9f5;
+  --code-fg-soft:        #a09d96;
+
+  --globe-water:         #0f0e0c;
+  --globe-land:          #efe9de;
+  --globe-marker:        #cc785c;
+  --globe-atmosphere:    #cc785c;
+
+  --shadow-soft:         0 1px 3px rgba(0,0,0,0.40);
+  --shadow-card:         0 1px 2px rgba(0,0,0,0.30), 0 8px 32px rgba(0,0,0,0.25);
+}
+
+/* ============================================================
+   RESET / BASE
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--canvas);
+  color: var(--body);
+  font-family: var(--ff-body);
+  font-size: 16px;
+  line-height: 1.55;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color .35s ease, color .35s ease;
+}
+img, svg { display: block; max-width: 100%; }
+a { color: var(--primary); text-decoration: none; }
+a:hover { text-decoration: underline; }
+button { font: inherit; cursor: pointer; }
+
+::selection { background: var(--primary); color: var(--on-primary); }
+
+/* ============================================================
+   TYPOGRAPHY — strict mapping of DESIGN.md hierarchy
+   ============================================================ */
+.t-display-xl,
+.t-display-lg,
+.t-display-md,
+.t-display-sm {
+  font-family: var(--ff-display);
+  font-weight: 400;
+  color: var(--ink);
+}
+.t-display-xl { font-size: clamp(40px, 6.4vw, 80px); line-height: 1.04; letter-spacing: -1.8px; }
+.t-display-lg { font-size: clamp(36px, 4.6vw, 56px); line-height: 1.08; letter-spacing: -1.2px; }
+.t-display-md { font-size: clamp(28px, 3.2vw, 40px); line-height: 1.14; letter-spacing: -0.6px; }
+.t-display-sm { font-size: clamp(22px, 2.4vw, 30px); line-height: 1.2;  letter-spacing: -0.3px; }
+
+.t-title-lg { font: 500 22px/1.3 var(--ff-body); color: var(--ink); }
+.t-title-md { font: 500 18px/1.4 var(--ff-body); color: var(--ink); }
+.t-title-sm { font: 500 16px/1.4 var(--ff-body); color: var(--ink); }
+
+.t-body-md { font: 400 16px/1.65 var(--ff-body); color: var(--body); }
+.t-body-sm { font: 400 14px/1.6  var(--ff-body); color: var(--body); }
+.t-body-lead {
+  font-family: var(--ff-display);
+  font-size: clamp(20px, 2.2vw, 26px);
+  line-height: 1.4;
+  color: var(--body-strong);
+  font-style: italic;
+  font-weight: 400;
+}
+
+.t-caption        { font: 500 13px/1.4 var(--ff-body); color: var(--muted); }
+.t-caption-upper  { font: 500 12px/1.4 var(--ff-body); color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; }
+.t-code           { font: 400 14px/1.6 var(--ff-code); }
+
+/* numeric / ranking digits — display serif at large size feels editorial */
+.rank-num {
+  font-family: var(--ff-display);
+  font-size: 38px;
+  line-height: 1;
+  color: var(--muted);
+  letter-spacing: -1px;
+  min-width: 64px;
+  font-feature-settings: "lnum" 1, "tnum" 1;
+}
+
+/* ============================================================
+   LAYOUT
+   ============================================================ */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--s-xl);
+}
+.container-narrow {
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 0 var(--s-xl);
+}
+
+section { position: relative; }
+.section-band { padding: var(--s-sec) 0; }
+.section-band--tight { padding: calc(var(--s-sec) * 0.6) 0; }
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-xs);
+  font: 500 12px/1.4 var(--ff-body);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: var(--s-lg);
+}
+.eyebrow::before {
+  content: "";
+  width: 6px; height: 6px;
+  background: var(--primary);
+  border-radius: 50%;
+  display: inline-block;
+}
+
+/* reveal-on-scroll */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity .7s cubic-bezier(.22,.61,.36,1), transform .7s cubic-bezier(.22,.61,.36,1);
+}
+.reveal.is-in { opacity: 1; transform: none; }
+.reveal.delay-1 { transition-delay: .08s; }
+.reveal.delay-2 { transition-delay: .16s; }
+.reveal.delay-3 { transition-delay: .24s; }
+.reveal.delay-4 { transition-delay: .32s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
+}
+
+/* ============================================================
+   TOP NAV — DESIGN.md `top-nav` component
+   ============================================================ */
+.top-nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  height: 64px;
+  background: color-mix(in srgb, var(--canvas) 88%, transparent);
+  backdrop-filter: saturate(140%) blur(12px);
+  -webkit-backdrop-filter: saturate(140%) blur(12px);
+  border-bottom: 1px solid var(--hairline-soft);
+  display: flex;
+  align-items: center;
+  transition: background-color .35s ease, border-color .35s ease;
+}
+.top-nav__inner {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--s-xl);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-md);
+}
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-sm);
+  color: var(--ink);
+  font: 500 14px/1 var(--ff-body);
+  letter-spacing: 0.2px;
+}
+.brand .spike { width: 16px; height: 16px; color: var(--ink); }
+.brand strong { font-weight: 500; }
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--s-xs);
+}
+.theme-toggle {
+  width: 36px; height: 36px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--hairline);
+  background: var(--canvas);
+  color: var(--ink);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .2s ease, color .2s ease, border-color .2s ease, transform .2s ease;
+}
+.theme-toggle:hover { transform: translateY(-1px); }
+.theme-toggle svg { width: 16px; height: 16px; }
+.theme-toggle .sun { display: none; }
+.theme-toggle .moon { display: inline-block; }
+[data-theme="dark"] .theme-toggle .sun { display: inline-block; }
+[data-theme="dark"] .theme-toggle .moon { display: none; }
+
+/* ============================================================
+   S1 — HERO
+   ============================================================ */
+.hero {
+  padding-top: var(--s-sec);
+  padding-bottom: var(--s-sec);
+}
+.hero__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  gap: var(--s-xxl);
+  align-items: center;
+}
+@media (max-width: 900px) {
+  .hero__grid { grid-template-columns: 1fr; gap: var(--s-xl); }
+}
+.hero h1 {
+  margin: 0 0 var(--s-lg);
+  max-width: 16ch;
+}
+.hero p.t-body-lead { margin: 0 0 var(--s-lg); max-width: 36ch; }
+.hero .meta-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-md) var(--s-xl);
+  margin-top: var(--s-xl);
+  padding-top: var(--s-xl);
+  border-top: 1px solid var(--hairline);
+}
+.meta-strip .stat { display: flex; flex-direction: column; gap: var(--s-xxs); }
+.meta-strip .stat .num {
+  font-family: var(--ff-display);
+  font-size: 32px;
+  line-height: 1;
+  color: var(--ink);
+  letter-spacing: -0.6px;
+}
+.meta-strip .stat .lbl {
+  font: 500 12px/1.4 var(--ff-body);
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* hero illustration card — a "now-playing"-style card */
+.now-card {
+  background: var(--surface-card);
+  border-radius: var(--r-xl);
+  padding: var(--s-xl);
+  border: 1px solid var(--hairline-soft);
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+.now-card__rail {
+  position: absolute; inset: 0 0 0 0;
+  pointer-events: none;
+  background: radial-gradient(120% 80% at 100% 0%, color-mix(in srgb, var(--primary) 16%, transparent) 0%, transparent 60%);
+}
+.now-card .label {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-xs);
+  font: 500 12px/1 var(--ff-body);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: var(--s-lg);
+}
+.now-card .label::before {
+  content: "";
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--primary);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 16%, transparent);
+  animation: pulse 2.4s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%,100% { box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 18%, transparent); }
+  50%     { box-shadow: 0 0 0 9px color-mix(in srgb, var(--primary) 6%, transparent); }
+}
+.now-card .track-name {
+  position: relative;
+  font-family: var(--ff-display);
+  font-size: clamp(26px, 3vw, 36px);
+  line-height: 1.12;
+  color: var(--ink);
+  letter-spacing: -0.4px;
+  margin: 0 0 var(--s-xs);
+}
+.now-card .track-artist {
+  position: relative;
+  font: 500 16px/1.4 var(--ff-body);
+  color: var(--body-strong);
+  margin: 0 0 var(--s-lg);
+}
+.now-card .footnote {
+  position: relative;
+  font: 400 14px/1.55 var(--ff-body);
+  color: var(--muted);
+  font-style: italic;
+}
+.now-card .footnote em {
+  font-style: normal;
+  color: var(--body-strong);
+  font-weight: 500;
+}
+
+/* ============================================================
+   S2 — OBSESSION ARCHIVE
+   ============================================================ */
+.obsession__head {
+  max-width: 720px;
+  margin: 0 0 var(--s-xxl);
+}
+.obsession__head h2 { margin: 0 0 var(--s-md); }
+.obsession__head p { margin: 0; color: var(--body); }
+
+.obsession__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s-xxl);
+}
+@media (max-width: 900px) {
+  .obsession__grid { grid-template-columns: 1fr; gap: var(--s-xl); }
+}
+
+.list-card {
+  background: transparent;
+}
+.list-card h3 {
+  margin: 0 0 var(--s-lg);
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s-md);
+}
+.list-card .col-hint {
+  font: 500 12px/1 var(--ff-body);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.rank-row {
+  display: grid;
+  grid-template-columns: 56px 1fr auto;
+  align-items: center;
+  gap: var(--s-md);
+  padding: var(--s-md) 0;
+  border-bottom: 1px solid var(--hairline-soft);
+}
+.rank-row:first-of-type { border-top: 1px solid var(--hairline); }
+.rank-row:last-of-type { border-bottom: 1px solid var(--hairline); }
+
+.rank-row .rank-num { min-width: auto; font-size: 28px; }
+.rank-row .primary-line {
+  font: 500 16px/1.35 var(--ff-body);
+  color: var(--ink);
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0 var(--s-xs);
+}
+.rank-row .secondary-line {
+  font: 400 13px/1.4 var(--ff-body);
+  color: var(--muted);
+}
+.rank-row .plays {
+  font-family: var(--ff-display);
+  font-size: 20px;
+  color: var(--ink);
+  letter-spacing: -0.3px;
+  font-feature-settings: "lnum" 1, "tnum" 1;
+}
+.rank-row .plays small {
+  font: 500 11px/1 var(--ff-body);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-left: 4px;
+}
+
+/* highlight rows */
+.rank-row.is-highlight .primary-line { color: var(--primary); }
+
+/* annotated commentary block */
+.commentary {
+  margin-top: var(--s-xxl);
+  padding-top: var(--s-xxl);
+  border-top: 1px solid var(--hairline);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s-xl);
+}
+@media (max-width: 900px) { .commentary { grid-template-columns: 1fr; } }
+.commentary .annot {
+  font: 400 15px/1.65 var(--ff-body);
+  color: var(--body);
+}
+.commentary .annot strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+.commentary .annot .pull {
+  display: block;
+  font-family: var(--ff-display);
+  font-size: 22px;
+  line-height: 1.3;
+  color: var(--ink);
+  margin: 0 0 var(--s-sm);
+  letter-spacing: -0.2px;
+}
+
+/* ============================================================
+   S3 — TIMELINE (sticky scroll)
+   ============================================================ */
+.timeline {
+  padding: var(--s-sec) 0 0;
+}
+.timeline__head {
+  max-width: 720px;
+  margin: 0 0 var(--s-xxl);
+}
+.timeline__head h2 { margin: 0 0 var(--s-md); }
+.timeline__head p { margin: 0; color: var(--body); }
+
+.timeline__grid {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: var(--s-xxl);
+  align-items: start;
+}
+@media (max-width: 900px) {
+  .timeline__grid { grid-template-columns: 1fr; gap: var(--s-xl); }
+}
+
+/* left sticky axis */
+.tl-axis {
+  position: sticky;
+  top: 96px;
+  align-self: start;
+  padding: var(--s-md) 0;
+  height: calc(100vh - 160px);
+  display: flex;
+  flex-direction: column;
+}
+@media (max-width: 900px) { .tl-axis { position: static; height: auto; } }
+
+.tl-axis__years {
+  position: relative;
+  flex: 1;
+  padding-left: var(--s-lg);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.tl-axis__years::before {
+  content: "";
+  position: absolute;
+  left: 7px; top: 0; bottom: 0;
+  width: 1px;
+  background: var(--hairline);
+}
+.tl-axis__year {
+  position: relative;
+  padding-left: var(--s-lg);
+  font: 500 13px/1 var(--ff-body);
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--muted);
+  transition: color .3s ease;
+}
+.tl-axis__year::before {
+  content: "";
+  position: absolute;
+  left: -8px; top: -4px;
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  background: var(--canvas);
+  border: 1px solid var(--hairline);
+  transition: background .25s ease, border-color .25s ease, transform .25s ease;
+}
+.tl-axis__year.is-active { color: var(--primary); }
+.tl-axis__year.is-active::before {
+  background: var(--primary);
+  border-color: var(--primary);
+  transform: scale(1.25);
+}
+
+.tl-axis__nowat {
+  margin-top: var(--s-lg);
+  padding: var(--s-md);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-md);
+  background: var(--surface-soft);
+}
+.tl-axis__nowat .lbl {
+  font: 500 11px/1 var(--ff-body);
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.tl-axis__nowat .val {
+  font-family: var(--ff-display);
+  font-size: 22px;
+  line-height: 1.15;
+  color: var(--ink);
+  letter-spacing: -0.3px;
+}
+
+/* right event stream */
+.tl-stream {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-xl);
+  padding-bottom: var(--s-sec);
+}
+
+.tl-event {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  gap: var(--s-lg);
+  padding: var(--s-xl) 0;
+  border-top: 1px solid var(--hairline-soft);
+}
+.tl-event:first-of-type { border-top: 1px solid var(--hairline); }
+
+.tl-event__when {
+  font: 500 12px/1.4 var(--ff-body);
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.tl-event__when .yr {
+  display: block;
+  font-family: var(--ff-display);
+  font-size: 28px;
+  letter-spacing: -0.4px;
+  text-transform: none;
+  color: var(--ink);
+  margin-top: 4px;
+}
+
+.tl-event__body h3 {
+  margin: 0 0 var(--s-sm);
+  font-family: var(--ff-display);
+  font-size: clamp(22px, 2.2vw, 28px);
+  line-height: 1.2;
+  letter-spacing: -0.3px;
+  color: var(--ink);
+  font-weight: 400;
+}
+.tl-event__body p {
+  margin: 0 0 var(--s-sm);
+  font: 400 15px/1.6 var(--ff-body);
+  color: var(--body);
+}
+.tl-event__pills {
+  display: flex; flex-wrap: wrap; gap: var(--s-xs);
+  margin-top: var(--s-sm);
+}
+.pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 12px;
+  border-radius: var(--r-pill);
+  background: var(--surface-card);
+  color: var(--ink);
+  font: 500 12px/1.4 var(--ff-body);
+}
+.pill.pill-coral {
+  background: var(--primary);
+  color: var(--on-primary);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-size: 11px;
+}
+
+/* coda — what's happening now */
+.tl-coda {
+  margin-top: var(--s-xxl);
+  padding: var(--s-xl);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-lg);
+  background: var(--surface-soft);
+}
+.tl-coda h4 {
+  margin: 0 0 var(--s-sm);
+  font-family: var(--ff-display);
+  font-size: 22px;
+  letter-spacing: -0.3px;
+  color: var(--ink);
+  font-weight: 400;
+}
+.tl-coda p { margin: 0 0 var(--s-sm); font: 400 15px/1.6 var(--ff-body); color: var(--body); }
+.tl-coda p:last-child { margin-bottom: 0; }
+
+/* ============================================================
+   S4 — FORGOTTEN SHELF
+   ============================================================ */
+.forgotten {
+  padding: var(--s-sec) 0;
+}
+.forgotten__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s-xxl);
+  align-items: start;
+}
+@media (max-width: 900px) { .forgotten__grid { grid-template-columns: 1fr; gap: var(--s-xl); } }
+
+.forgotten__lead h2 { margin: 0 0 var(--s-md); }
+.forgotten__lead p { margin: 0 0 var(--s-lg); color: var(--body); }
+
+.forgotten__stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s-md);
+  margin-top: var(--s-xl);
+}
+.stat-tile {
+  padding: var(--s-lg);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-lg);
+  background: var(--canvas);
+}
+.stat-tile .num {
+  font-family: var(--ff-display);
+  font-size: clamp(44px, 5vw, 60px);
+  line-height: 1;
+  color: var(--ink);
+  letter-spacing: -1.2px;
+  font-feature-settings: "lnum" 1, "tnum" 1;
+}
+.stat-tile .lbl {
+  margin-top: var(--s-sm);
+  font: 500 12px/1.4 var(--ff-body);
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.stat-tile .sub {
+  margin-top: var(--s-xs);
+  font: 400 14px/1.5 var(--ff-body);
+  color: var(--body);
+}
+
+/* coral callout — full bleed quote */
+.coral-callout {
+  background: var(--primary);
+  color: var(--on-primary);
+  border-radius: var(--r-lg);
+  padding: var(--s-xxl);
+  position: relative;
+  overflow: hidden;
+}
+.coral-callout::before {
+  content: "“";
+  position: absolute;
+  top: -40px; left: 16px;
+  font-family: var(--ff-display);
+  font-size: 240px;
+  line-height: 1;
+  color: color-mix(in srgb, var(--on-primary) 16%, transparent);
+  pointer-events: none;
+}
+.coral-callout blockquote {
+  position: relative;
+  margin: 0;
+  font-family: var(--ff-display);
+  font-size: clamp(24px, 2.6vw, 32px);
+  line-height: 1.32;
+  letter-spacing: -0.3px;
+  color: var(--on-primary);
+}
+.coral-callout cite {
+  display: block;
+  margin-top: var(--s-lg);
+  font: 500 12px/1 var(--ff-body);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--on-primary) 80%, transparent);
+  font-style: normal;
+}
+
+/* forgotten list — small ghost rows */
+.ghost-list {
+  margin-top: var(--s-xxl);
+  border-top: 1px solid var(--hairline);
+}
+.ghost-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--s-md);
+  padding: var(--s-md) 0;
+  border-bottom: 1px solid var(--hairline-soft);
+  align-items: baseline;
+}
+.ghost-row__name { font: 500 15px/1.4 var(--ff-body); color: var(--ink); }
+.ghost-row__name small { font: 400 13px/1.4 var(--ff-body); color: var(--muted); display: block; margin-top: 2px; }
+.ghost-row__age { font: 500 12px/1 var(--ff-body); letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+
+/* ============================================================
+   S5 — GEOGRAPHY (globe.gl)
+   ============================================================ */
+.geography {
+  padding: var(--s-sec) 0 0;
+}
+.geography__head {
+  max-width: 720px;
+  margin: 0 0 var(--s-xxl);
+}
+.geography__head h2 { margin: 0 0 var(--s-md); }
+.geography__head p { margin: 0; color: var(--body); }
+
+.geo-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: var(--s-xxl);
+  align-items: start;
+}
+@media (max-width: 900px) { .geo-grid { grid-template-columns: 1fr; gap: var(--s-xl); } }
+
+.geo-stage {
+  position: sticky;
+  top: 96px;
+  height: calc(100vh - 160px);
+  min-height: 520px;
+  border-radius: var(--r-xl);
+  background: var(--canvas);
+  border: 1px solid var(--hairline);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+@media (max-width: 900px) { .geo-stage { position: static; height: 60vh; min-height: 420px; } }
+
+#globe { width: 100%; height: 100%; cursor: grab; }
+#globe:active { cursor: grabbing; }
+
+.geo-narrative { display: flex; flex-direction: column; gap: var(--s-md); padding-bottom: var(--s-sec); }
+.country-card {
+  padding: var(--s-xl);
+  border-radius: var(--r-lg);
+  border: 1px solid var(--hairline);
+  background: var(--canvas);
+  transition: border-color .3s ease, background-color .3s ease, transform .3s ease;
+  min-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.country-card.is-active {
+  border-color: var(--primary);
+  background: var(--surface-soft);
+}
+.country-card__flag {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-xs);
+  font: 500 12px/1 var(--ff-body);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: var(--s-md);
+}
+.country-card__flag .code {
+  font-family: var(--ff-code);
+  letter-spacing: 0;
+  padding: 4px 8px;
+  border-radius: var(--r-xs);
+  background: var(--surface-card);
+  color: var(--ink);
+}
+.country-card h3 {
+  margin: 0 0 var(--s-sm);
+  font-family: var(--ff-display);
+  font-size: clamp(28px, 2.8vw, 36px);
+  line-height: 1.12;
+  letter-spacing: -0.5px;
+  color: var(--ink);
+  font-weight: 400;
+}
+.country-card p {
+  margin: 0 0 var(--s-md);
+  font: 400 15px/1.6 var(--ff-body);
+  color: var(--body);
+}
+.country-card .top-artists {
+  display: flex; flex-direction: column; gap: 6px;
+  margin-top: var(--s-md);
+  padding-top: var(--s-md);
+  border-top: 1px solid var(--hairline-soft);
+}
+.country-card .top-artists .row {
+  display: flex; justify-content: space-between; align-items: baseline;
+  font: 400 14px/1.4 var(--ff-body);
+  color: var(--body);
+}
+.country-card .top-artists .row strong { color: var(--ink); font-weight: 500; }
+.country-card .top-artists .row .plays {
+  font-family: var(--ff-display);
+  font-size: 17px;
+  color: var(--ink);
+  letter-spacing: -0.2px;
+}
+
+/* cluster summary strip */
+.cluster-strip {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: var(--s-md);
+  margin-top: var(--s-xxl);
+}
+@media (max-width: 900px) { .cluster-strip { grid-template-columns: repeat(2, 1fr); } }
+.cluster-tile {
+  padding: var(--s-md);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-md);
+  background: var(--canvas);
+}
+.cluster-tile .pct {
+  font-family: var(--ff-display);
+  font-size: 28px;
+  color: var(--ink);
+  letter-spacing: -0.4px;
+}
+.cluster-tile .lbl {
+  margin-top: 4px;
+  font: 500 12px/1.3 var(--ff-body);
+  color: var(--muted);
+  letter-spacing: 0.5px;
+}
+
+/* ============================================================
+   S6 — PORTRAIT
+   ============================================================ */
+.portrait { padding: var(--s-sec) 0; }
+.portrait__inner { max-width: 720px; margin: 0 auto; }
+.portrait h2 { margin: 0 0 var(--s-xl); }
+.portrait p {
+  font: 400 18px/1.65 var(--ff-body);
+  color: var(--body);
+  margin: 0 0 var(--s-lg);
+}
+.portrait p:first-of-type {
+  font-family: var(--ff-display);
+  font-size: clamp(22px, 2.2vw, 26px);
+  line-height: 1.4;
+  color: var(--body-strong);
+  font-style: italic;
+}
+.portrait .traits {
+  margin-top: var(--s-xxl);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--s-md);
+}
+@media (max-width: 900px) { .portrait .traits { grid-template-columns: 1fr; } }
+.trait-card {
+  padding: var(--s-lg);
+  border-radius: var(--r-lg);
+  background: var(--surface-card);
+}
+.trait-card .num {
+  font-family: var(--ff-display);
+  font-size: 32px;
+  color: var(--ink);
+  letter-spacing: -0.5px;
+  margin-bottom: var(--s-xs);
+}
+.trait-card .name {
+  font: 500 14px/1.4 var(--ff-body);
+  color: var(--body-strong);
+}
+.trait-card .desc {
+  margin-top: var(--s-xs);
+  font: 400 13px/1.5 var(--ff-body);
+  color: var(--muted);
+}
+
+/* ============================================================
+   S7 — PLAYLISTS
+   ============================================================ */
+.playlists { padding: var(--s-sec) 0; }
+.playlists__head { max-width: 720px; margin: 0 0 var(--s-xxl); }
+.playlists__head h2 { margin: 0 0 var(--s-md); }
+.playlists__head p { margin: 0; color: var(--body); }
+
+.tabs {
+  display: flex;
+  gap: var(--s-xs);
+  flex-wrap: wrap;
+  margin-bottom: var(--s-xl);
+  padding: 4px;
+  background: var(--surface-soft);
+  border-radius: var(--r-md);
+  width: fit-content;
+}
+.tab {
+  padding: 10px 16px;
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--muted);
+  border: 0;
+  font: 500 14px/1.2 var(--ff-body);
+  transition: background-color .2s ease, color .2s ease;
+}
+.tab.is-active {
+  background: var(--canvas);
+  color: var(--ink);
+  box-shadow: var(--shadow-soft);
+}
+[data-theme="dark"] .tab.is-active { background: var(--surface-card); }
+
+.tabpanel { display: none; }
+.tabpanel.is-active { display: block; }
+
+.tabpanel__head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--s-md);
+  margin-bottom: var(--s-lg);
+}
+.tabpanel__head h3 {
+  margin: 0;
+  font-family: var(--ff-display);
+  font-size: clamp(26px, 2.4vw, 32px);
+  line-height: 1.15;
+  letter-spacing: -0.4px;
+  color: var(--ink);
+  font-weight: 400;
+}
+.tabpanel__head p { margin: 0; color: var(--body); max-width: 56ch; font-size: 15px; }
+
+.track-list {
+  border-top: 1px solid var(--hairline);
+  margin-bottom: var(--s-xl);
+}
+.track-row {
+  display: grid;
+  grid-template-columns: 24px 1fr auto;
+  gap: var(--s-md);
+  align-items: center;
+  padding: var(--s-sm) 0;
+  border-bottom: 1px solid var(--hairline-soft);
+}
+.track-row label {
+  display: contents;
+  cursor: pointer;
+}
+.track-row input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 18px; height: 18px;
+  border: 1.5px solid var(--hairline);
+  border-radius: var(--r-xs);
+  background: var(--canvas);
+  cursor: pointer;
+  display: grid;
+  place-content: center;
+  transition: background .15s ease, border-color .15s ease;
+}
+.track-row input[type="checkbox"]:hover { border-color: var(--primary); }
+.track-row input[type="checkbox"]:checked {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+.track-row input[type="checkbox"]:checked::after {
+  content: "";
+  width: 10px; height: 6px;
+  border-left: 2px solid var(--on-primary);
+  border-bottom: 2px solid var(--on-primary);
+  transform: rotate(-45deg) translateY(-1px);
+}
+.track-row__main { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.track-row__name { font: 500 15px/1.35 var(--ff-body); color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.track-row__artist { font: 400 13px/1.4 var(--ff-body); color: var(--muted); }
+.track-row__meta {
+  font-family: var(--ff-display);
+  font-size: 16px;
+  color: var(--muted);
+  letter-spacing: -0.2px;
+  white-space: nowrap;
+}
+
+.playlist-actions {
+  display: flex; align-items: center; gap: var(--s-md);
+  margin-bottom: var(--s-lg);
+}
+.btn-primary {
+  background: var(--primary);
+  color: var(--on-primary);
+  border: 0;
+  font: 500 14px/1 var(--ff-body);
+  padding: 14px 22px;
+  border-radius: var(--r-md);
+  transition: background-color .15s ease, transform .1s ease;
+}
+.btn-primary:hover { background: var(--primary-active); }
+.btn-primary:active { transform: translateY(1px); }
+.btn-secondary {
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--hairline);
+  font: 500 14px/1 var(--ff-body);
+  padding: 13px 22px;
+  border-radius: var(--r-md);
+}
+.selection-count { font: 400 13px/1 var(--ff-body); color: var(--muted); }
+
+/* code window — DESIGN.md `code-window-card` */
+.code-window {
+  background: var(--code-bg);
+  color: var(--code-fg);
+  border-radius: var(--r-lg);
+  padding: var(--s-lg);
+  overflow: hidden;
+  display: none;
+}
+.code-window.is-open { display: block; animation: slideIn .35s cubic-bezier(.22,.61,.36,1); }
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: none; }
+}
+.code-window__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--s-md);
+  padding-bottom: var(--s-md);
+  border-bottom: 1px solid color-mix(in srgb, var(--code-fg) 12%, transparent);
+}
+.code-window__title {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-xs);
+  font: 500 13px/1 var(--ff-body);
+  color: var(--code-fg-soft);
+  letter-spacing: 0.5px;
+}
+.code-window__title .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--primary); display: inline-block; }
+.copy-btn {
+  background: color-mix(in srgb, var(--code-fg) 8%, transparent);
+  color: var(--code-fg);
+  border: 1px solid color-mix(in srgb, var(--code-fg) 14%, transparent);
+  font: 500 12px/1 var(--ff-body);
+  padding: 8px 14px;
+  border-radius: var(--r-sm);
+  transition: background-color .15s ease;
+}
+.copy-btn:hover { background: color-mix(in srgb, var(--code-fg) 14%, transparent); }
+.copy-btn.is-copied { background: var(--primary); border-color: var(--primary); color: var(--on-primary); }
+
+.code-window pre {
+  margin: 0;
+  font: 400 13px/1.65 var(--ff-code);
+  color: var(--code-fg);
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 420px;
+  overflow: auto;
+  padding-right: var(--s-sm);
+}
+.code-window .hint {
+  margin-top: var(--s-md);
+  padding-top: var(--s-md);
+  border-top: 1px solid color-mix(in srgb, var(--code-fg) 12%, transparent);
+  font: 400 12px/1.5 var(--ff-body);
+  color: var(--code-fg-soft);
+}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+.footer {
+  background: var(--code-bg);
+  color: var(--code-fg-soft);
+  padding: var(--s-xxl) 0;
+  margin-top: var(--s-sec);
+}
+.footer__inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--s-xl);
+  display: flex; justify-content: space-between; align-items: center; gap: var(--s-md);
+  flex-wrap: wrap;
+}
+.footer .brand { color: var(--code-fg); }
+.footer .brand .spike { color: var(--code-fg); }
+.footer small { font: 400 13px/1.4 var(--ff-body); color: var(--code-fg-soft); }
+
+/* utility */
+.hide-on-mobile { }
+@media (max-width: 700px) { .hide-on-mobile { display: none; } }
+
+/* country highlight when active card scrolls into view — globe bubble label */
+.globe-label {
+  position: absolute;
+  pointer-events: none;
+  padding: 6px 10px;
+  border-radius: var(--r-pill);
+  background: var(--primary);
+  color: var(--on-primary);
+  font: 500 12px/1 var(--ff-body);
+  letter-spacing: 0.5px;
+  transform: translate(-50%, -120%);
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity .3s ease;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+}
+.globe-label.is-on { opacity: 1; }
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     TOP NAV
+     ============================================================ -->
+<nav class="top-nav">
+  <div class="top-nav__inner">
+    <a href="#hero" class="brand">
+      <svg class="spike" viewBox="0 0 24 24" aria-hidden="true">
+        <!-- Anthropic-style 4-spoke radial mark -->
+        <path fill="currentColor" d="M12 2 L13.5 9 L20 8 L14 12 L20 16 L13.5 15 L12 22 L10.5 15 L4 16 L10 12 L4 8 L10.5 9 Z"/>
+      </svg>
+      <strong>Listening Profile</strong>
+    </a>
+    <div class="nav-actions">
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme" title="Toggle theme">
+        <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 12.8A9 9 0 0 1 11.2 3a7 7 0 1 0 9.8 9.8Z"/>
+        </svg>
+        <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="4"/>
+          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- ============================================================
+     S1 — HERO
+     ============================================================ -->
+<section id="hero" class="hero">
+  <div class="container hero__grid">
+    <div>
+      <div class="eyebrow reveal">An editorial reading of an Apple Music library</div>
+      <h1 class="t-display-xl reveal delay-1">Your play count is a diary you never meant to publish.</h1>
+      <p class="t-body-lead reveal delay-2">
+        No stars. No hearts. Only the quiet arithmetic of how many times you came back to a song —
+        and how many you brought home and never opened again.
+      </p>
+
+      <div class="meta-strip reveal delay-3">
+        <div class="stat">
+          <span class="num" id="stat-tracks">901</span>
+          <span class="lbl">tracks in library</span>
+        </div>
+        <div class="stat">
+          <span class="num" id="stat-plays">6,376</span>
+          <span class="lbl">total plays</span>
+        </div>
+        <div class="stat">
+          <span class="num" id="stat-artists">300</span>
+          <span class="lbl">distinct artists</span>
+        </div>
+        <div class="stat">
+          <span class="num" id="stat-span">5y 6m</span>
+          <span class="lbl">span on record</span>
+        </div>
+      </div>
+    </div>
+
+    <aside class="now-card reveal delay-2" aria-label="Most recently added">
+      <div class="now-card__rail" aria-hidden="true"></div>
+      <div class="label">Most recently added</div>
+      <h2 class="track-name" id="recent-name">Chamber of Reflection</h2>
+      <p class="track-artist" id="recent-artist">Mac DeMarco</p>
+      <p class="footnote">
+        Added <em id="recent-when">May 2026</em>. Right before it: <em>Save the Day</em> by SZA,
+        and a 26-track plunge into <em>Nujabes</em> — a Japanese producer who has been gone since 2010.
+        The line you’re tracing right now leans inward.
+      </p>
+    </aside>
+  </div>
+</section>
+
+<!-- ============================================================
+     S2 — OBSESSION ARCHIVE
+     ============================================================ -->
+<section id="obsession" class="section-band">
+  <div class="container">
+    <header class="obsession__head reveal">
+      <div class="eyebrow">Chapter 01 · The obsession archive</div>
+      <h2 class="t-display-lg">Some names you played a few hundred times. Most you played once.</h2>
+      <p class="t-body-md">
+        Across <strong>779</strong> tracks you have ever pressed play on, the top ten artists account for
+        <strong>35.5%</strong> of every listen. Average repeat: 8.2. Maximum: 36.
+        This isn’t a casual library — it’s a few deep wells with a wide field around them.
+      </p>
+    </header>
+
+    <div class="obsession__grid">
+      <div class="list-card reveal">
+        <h3 class="t-title-lg">Top artists <span class="col-hint">By total plays</span></h3>
+        <div id="top-artists-list"></div>
+      </div>
+
+      <div class="list-card reveal delay-1">
+        <h3 class="t-title-lg">Top tracks <span class="col-hint">By repeat count</span></h3>
+        <div id="top-tracks-list"></div>
+      </div>
+    </div>
+
+    <div class="commentary">
+      <div class="annot reveal">
+        <span class="pull">Harry Styles — the single-track obsession.</span>
+        <em>Golden</em> (36), <em>Watermelon Sugar</em> (33), <em>Adore You</em> (33). He occupies 5 of your top 20 tracks,
+        but only 4th place by total artist plays. The pattern is unusual: a few songs played to the point of memorisation,
+        not the catalog devoured.
+      </div>
+      <div class="annot reveal delay-1">
+        <span class="pull">Two ghosts at the top.</span>
+        Avicii left in 2018. Nujabes left in 2010. Together they own
+        <strong>538 plays</strong> in your library. Posthumous catalogs travel differently — they’re finite.
+        You keep returning to a closed door.
+      </div>
+      <div class="annot reveal">
+        <span class="pull">Sia Furler, the steady #1.</span>
+        361 plays, more than anyone else. In <strong>June 2021</strong> alone you added 19 of her tracks in a single sweep —
+        the foundation under every later spike.
+      </div>
+      <div class="annot reveal delay-1">
+        <span class="pull">大瀧詠一 / Eiichi Otaki — 262 plays.</span>
+        Shōwa-era Japanese city pop, dropped in mostly across two months in <strong>2023</strong>.
+        The fact that he ranks third — next to Sia and Avicii — is itself a signal: your taste does not stay in one hemisphere.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     S3 — TIMELINE
+     ============================================================ -->
+<section id="timeline" class="timeline">
+  <div class="container">
+    <header class="timeline__head reveal">
+      <div class="eyebrow">Chapter 02 · Diggings &amp; rabbit holes</div>
+      <h2 class="t-display-lg">Six years of monthly excavations.</h2>
+      <p class="t-body-md">
+        Every column below is a month where something specific entered your library — a series finished, an artist found,
+        a producer’s catalog opened. Twenty-seven of them are worth telling on their own.
+      </p>
+    </header>
+
+    <div class="timeline__grid">
+      <aside class="tl-axis">
+        <div class="tl-axis__years" id="tl-axis-years">
+          <!-- year markers injected -->
+        </div>
+        <div class="tl-axis__nowat" aria-live="polite">
+          <div class="lbl">Reading</div>
+          <div class="val" id="tl-nowat">2020 · The Apple Music era begins</div>
+        </div>
+      </aside>
+
+      <div class="tl-stream" id="tl-stream">
+        <!-- event cards injected -->
+      </div>
+    </div>
+
+    <div class="container-narrow" style="padding:0;">
+      <div class="tl-coda reveal">
+        <h4>What’s happening, now.</h4>
+        <p>
+          The most recent stretch is unusually inward. January 2026 added Nomak and RHYMESTER — Nujabes
+          stretching out into adjacent Japanese hip-hop. February brought three records that don’t belong on the same shelf:
+          Guns N’ Roses, 罗大佑, LJones. April was a single SZA soundtrack cut. May was a single Mac DeMarco song,
+          its title <em>Chamber of Reflection</em>, which reads as a found object.
+        </p>
+        <p>The pattern, if there is one: you’re collecting rooms, not records.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     S4 — FORGOTTEN SHELF
+     ============================================================ -->
+<section id="forgotten" class="forgotten">
+  <div class="container">
+    <div class="forgotten__grid">
+      <div class="forgotten__lead reveal">
+        <div class="eyebrow">Chapter 03 · The forgotten shelf</div>
+        <h2 class="t-display-lg">Some you brought home and never opened.</h2>
+        <p class="t-body-md">
+          <strong>117</strong> tracks have never been played, even though they’ve been in your library for over a year.
+          Another <strong>512</strong> haven’t been touched in more than twelve months. The pattern of what gets forgotten
+          is its own portrait.
+        </p>
+
+        <div class="forgotten__stats">
+          <div class="stat-tile">
+            <div class="num">117</div>
+            <div class="lbl">Never played</div>
+            <div class="sub">Owned for a year or more.</div>
+          </div>
+          <div class="stat-tile">
+            <div class="num">512</div>
+            <div class="lbl">Cold for 12 months</div>
+            <div class="sub">Loved once, set down quietly.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="reveal delay-1">
+        <figure class="coral-callout">
+          <blockquote>
+            The forgotten things have a shape: Anime, J-Pop, and the long tail of the 2020 binge.
+            放課後ティータイム, μ’s, LiSA, Linked Horizon — what carried you through one season
+            never quite carried you into the next.
+          </blockquote>
+          <cite>Top forgotten genres · Pop 158 · J-Pop 112 · Anime 93</cite>
+        </figure>
+
+        <div class="ghost-list" id="ghost-list"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     S5 — GEOGRAPHY
+     ============================================================ -->
+<section id="geography" class="geography">
+  <div class="container">
+    <header class="geography__head reveal">
+      <div class="eyebrow">Chapter 04 · Geography of taste</div>
+      <h2 class="t-display-lg">You walk a line between two pop traditions.</h2>
+      <p class="t-body-md">
+        Of <strong>300</strong> mapped artists, <strong>113</strong> are American, <strong>56</strong> Japanese,
+        <strong>34</strong> British. The Japanese share is unusually high for a non-Japanese listener — not an accident,
+        and not a phase. Scroll to see who carries each country in your library.
+      </p>
+    </header>
+
+    <div class="geo-grid">
+      <div class="geo-stage">
+        <div id="globe"></div>
+        <div class="globe-label" id="globe-label">United States</div>
+      </div>
+
+      <div class="geo-narrative" id="geo-narrative">
+        <!-- country cards injected -->
+      </div>
+    </div>
+
+    <div class="cluster-strip" id="cluster-strip">
+      <!-- cluster tiles injected -->
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     S6 — PORTRAIT
+     ============================================================ -->
+<section id="portrait" class="portrait">
+  <div class="container-narrow portrait__inner">
+    <header class="reveal">
+      <div class="eyebrow">Chapter 05 · The portrait</div>
+      <h2 class="t-display-lg">A picture, drawn entirely by what you played twice.</h2>
+    </header>
+
+    <p class="reveal">
+      You don’t star, you don’t heart, you don’t curate. Apple Music asks you, and you ignore it.
+      The rating column is empty. The loved column is empty. And yet 271 tracks have been played 10 times or more —
+      so the curation is happening, just somewhere underneath where you’d admit it.
+    </p>
+    <p class="reveal delay-1">
+      Your discovery pattern is event-driven. Every year, a few months arrive in which something new arrives in volume —
+      usually downstream of an anime, occasionally from a producer’s back catalog, once from a video-game soundtrack.
+      The bursts are predictable; what arrives inside them is not.
+    </p>
+    <p class="reveal delay-2">
+      You don’t leave a genre, you fold it in. K-On! never left, even when it stopped being played; Adele co-exists with
+      Eiichi Otaki; Nujabes sits on the same shelf as Justin Bieber’s <em>DAISIES</em> — the highest-played new addition
+      of the past three years. The library is additive. Whatever the most recent room contains, the older rooms are
+      still down the hallway.
+    </p>
+
+    <div class="traits">
+      <div class="trait-card reveal">
+        <div class="num">30%</div>
+        <div class="name">Of tracks played ≥10 times</div>
+        <div class="desc">A repeat listener, not a wanderer.</div>
+      </div>
+      <div class="trait-card reveal delay-1">
+        <div class="num">27%</div>
+        <div class="name">Of plays are Japanese-rooted</div>
+        <div class="desc">A second home, not a guest visit.</div>
+      </div>
+      <div class="trait-card reveal delay-2">
+        <div class="num">0</div>
+        <div class="name">Stars, hearts, or explicit ratings</div>
+        <div class="desc">The behavior is the rating.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     S7 — PLAYLISTS
+     ============================================================ -->
+<section id="playlists" class="playlists">
+  <div class="container">
+    <header class="playlists__head reveal">
+      <div class="eyebrow">Chapter 06 · Three playlists</div>
+      <h2 class="t-display-lg">Three doors, each leading somewhere already inside you.</h2>
+      <p class="t-body-md">
+        Pick the door. Edit the tracklist. Generate AppleScript and paste it into Terminal —
+        Music will build the playlist for you, with the songs already in your library.
+      </p>
+    </header>
+
+    <div class="tabs reveal" role="tablist">
+      <button class="tab is-active" data-tab="forgotten-awakening" role="tab">Forgotten Awakening</button>
+      <button class="tab" data-tab="recent-vein" role="tab">Recent Vein</button>
+      <button class="tab" data-tab="obsession-replay" role="tab">Obsession Replay</button>
+    </div>
+
+    <div id="tabpanels"></div>
+
+    <div class="code-window" id="codeWindow" aria-live="polite">
+      <div class="code-window__head">
+        <div class="code-window__title"><span class="dot"></span> AppleScript · run in Terminal</div>
+        <button class="copy-btn" id="copyBtn">Copy</button>
+      </div>
+      <pre id="codeBody"></pre>
+      <p class="hint">Paste into Terminal: <code>osascript &lt;&lt;'EOF'</code> &nbsp;then paste the script and end with <code>EOF</code>. Music will create the playlist using tracks already in your library.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     FOOTER
+     ============================================================ -->
+<footer class="footer">
+  <div class="footer__inner">
+    <div class="brand">
+      <svg class="spike" viewBox="0 0 24 24" aria-hidden="true">
+        <path fill="currentColor" d="M12 2 L13.5 9 L20 8 L14 12 L20 16 L13.5 15 L12 22 L10.5 15 L4 16 L10 12 L4 8 L10.5 9 Z"/>
+      </svg>
+      <strong>Listening Profile</strong>
+    </div>
+    <small>Generated <span id="gen-date">May 14, 2026</span> · 901 tracks · No tracking, no telemetry, no third parties.</small>
+  </div>
+</footer>
+
+<!-- ============================================================
+     GLOBE.GL
+     ============================================================ -->
+<script src="https://unpkg.com/three@0.155.0/build/three.min.js"></script>
+<script src="https://unpkg.com/globe.gl@2.32.4/dist/globe.gl.min.js"></script>
+
+<script id="DATA" type="application/json">
+{
+  "meta": { "trackCount": 901, "totalPlays": 6376, "uniqueArtists": 300, "generated": "May 14, 2026" },
+  "topArtists": [
+    {"artist":"Sia Furler","plays":361,"highlight":"#1 by total plays — the steady foundation"},
+    {"artist":"Avicii","plays":352,"highlight":"Posthumous catalog, finite by design"},
+    {"artist":"Eiichi Otaki / 大瀧詠一","plays":262,"highlight":"Shōwa-era city pop, opened in 2023"},
+    {"artist":"Harry Styles","plays":252,"highlight":"Single-track obsession — 5 of your top 20"},
+    {"artist":"Utada","plays":199,"highlight":""},
+    {"artist":"Nujabes","plays":186,"highlight":"Producer, gone since 2010, found in 2025"},
+    {"artist":"Adele","plays":173,"highlight":""},
+    {"artist":"Shania Twain","plays":171,"highlight":""},
+    {"artist":"Tame Impala","plays":168,"highlight":""},
+    {"artist":"Herb Alpert &amp; The Tijuana Brass","plays":138,"highlight":""}
+  ],
+  "topTracks": [
+    {"name":"Golden","artist":"Harry Styles","plays":36},
+    {"name":"Watermelon Sugar","artist":"Harry Styles","plays":33},
+    {"name":"Adore You","artist":"Harry Styles","plays":33},
+    {"name":"Under Pressure (feat. David Bowie)","artist":"Queen","plays":32},
+    {"name":"I Want To Break Free","artist":"Queen","plays":31},
+    {"name":"Lights Up","artist":"Harry Styles","plays":29},
+    {"name":"おもかげ (produced by Vaundy)","artist":"milet, Aimer &amp; Lilas Ikuta","plays":27},
+    {"name":"Snowman","artist":"Sia Furler","plays":27},
+    {"name":"Velvet Motel","artist":"Eiichi Otaki","plays":26},
+    {"name":"カナリア諸島にて","artist":"Eiichi Otaki","plays":26}
+  ],
+  "timeline": [
+    {"month":"2020-11","year":"2020","title":"K-On! and Love Live! arrive together","note":"放課後ティータイム enters at 24 tracks; μ’s at 8. The library begins with a season already underway.","pills":["Anime","55 added"]},
+    {"month":"2020-12","year":"2020","title":"Three parallel lines pull in at once","note":"Utawarerumono, Shania Twain, Avicii — anime soundtrack, country, EDM. 100 tracks in a single month.","pills":["100 added","peak"]},
+    {"month":"2021-02","year":"2021","title":"Adele, an entire album in one sweep","note":"62 tracks added; 56 of them are hers. A focused excavation, not a discovery.","pills":["Adele","62 added"]},
+    {"month":"2021-03","year":"2021","title":"Three obsessions converge","note":"Avicii, LiSA, and Utada — the highest-volume month in your library. 106 tracks.","pills":["106 added","library peak"]},
+    {"month":"2021-06","year":"2021","title":"Sia Furler — the foundation goes down","note":"19 tracks added in one month. Every later high-play count for her rests on this sweep.","pills":["Sia","19 added"]},
+    {"month":"2021-07","year":"2021","title":"橘子海 — a small Taiwanese Britpop band","note":"9 tracks. The first non-mainstream Chinese-language entry in the library.","pills":["Mandopop","TW"]},
+    {"month":"2021-08","year":"2021","title":"Queen, in volume","note":"21 tracks. Two of them — Under Pressure, I Want to Break Free — will sit at top-of-track for years.","pills":["Queen","21 added"]},
+    {"month":"2021-09","year":"2021","title":"Shania Twain returns; Aimer enters","note":"86 tracks in one month, the third-highest. Country and J-Pop on the same shelf.","pills":["86 added"]},
+    {"month":"2021-10","year":"2021","title":"Aimer and Yo-Yo Ma, same week","note":"Anime soundtrack vocals meet classical chamber music. The library refuses to commit to one register.","pills":["Range"]},
+    {"month":"2021-11","year":"2021","title":"Adele’s 30, day-of","note":"12 tracks added to follow the release.","pills":["Adele"]},
+    {"month":"2022-03","year":"2022","title":"Molchat Doma — Belarusian post-punk","note":"4 tracks. A side door opens to Eastern European cold-wave.","pills":["BY","Post-punk"]},
+    {"month":"2022-08","year":"2022","title":"告五人 — Taiwan, again","note":"First entry; 3 tracks. They’ll come back.","pills":["Mandopop"]},
+    {"month":"2022-10","year":"2022","title":"Cyberpunk: Edgerunners OST","note":"akira kondo, Rosa Walton &amp; Hallie Coggins. The anime catalog widens into game-adjacent territory.","pills":["OST"]},
+    {"month":"2022-11","year":"2022","title":"真夜中のドア sneaks in","note":"The first city-pop signal. A trickle, not a wave — yet.","pills":["City Pop"]},
+    {"month":"2022-12","year":"2022","title":"Chainsaw Man — Kick Back; Sawano Hiroyuki","note":"Yonezu Kenshi and 泽野弘之 arrive on the same trigger.","pills":["Anime","J-Pop"]},
+    {"month":"2023-04","year":"2023","title":"Eiichi Otaki — first wave","note":"10 tracks. The Shōwa city-pop door opens.","pills":["City Pop"]},
+    {"month":"2023-09","year":"2023","title":"C418 — Minecraft, 17 tracks","note":"A long-quiet world re-enters as an ambient companion.","pills":["Ambient","17 added"]},
+    {"month":"2023-11","year":"2023","title":"Eiichi Otaki — second wave","note":"11 more tracks. By the end of 2023 he’s the third-most-played artist in your library.","pills":["City Pop"]},
+    {"month":"2024-01","year":"2024","title":"結束バンド — Bocchi the Rock! lands","note":"The 2024 anime soundtrack year begins here.","pills":["Anime"]},
+    {"month":"2024-05","year":"2024","title":"三月のパンタシア — 12 tracks","note":"Another anime trigger, this one delivered all at once.","pills":["Anime","12 added"]},
+    {"month":"2024-06","year":"2024","title":"MyGO!!!!! — BanG Dream","note":"The franchise opens its newest door.","pills":["Anime"]},
+    {"month":"2024-07","year":"2024","title":"Tame Impala — 12 tracks","note":"A non-Japanese deep-dive after months of J-Pop. The vein shifts again.","pills":["Alternative","12 added"]},
+    {"month":"2024-10","year":"2024","title":"Herb Alpert &amp; the Tijuana Brass","note":"14 tracks. A jazz catalog from 1960s LA arrives without warning.","pills":["Jazz","14 added"]},
+    {"month":"2025-04","year":"2025","title":"The Walters","note":"6 tracks. A small indie pocket.","pills":["Indie"]},
+    {"month":"2025-05","year":"2025","title":"Nujabes — the deep well","note":"26 tracks in a single month. A 14-year-old catalog opened from scratch.","pills":["Hip-Hop","26 added"]},
+    {"month":"2025-07","year":"2025","title":"Nujabes — Sanctuary Ship","note":"The aftermath of the deep dive — selected favorites surface.","pills":["Hip-Hop"]},
+    {"month":"2025-09","year":"2025","title":"Justin Bieber — DAISIES","note":"26 plays. The highest-played recent addition in the entire library.","pills":["Pop","#1 in 3yr"]}
+  ],
+  "ghostTracks": [
+    {"name":"放課後ティータイム","artist":"放課後ティータイム","yearsOwned":5.5,"genre":"Anime"},
+    {"name":"ふわふわ時間 (#23 Mix)","artist":"放課後ティータイム","yearsOwned":5.5,"genre":"Anime"},
+    {"name":"カレーのちライス","artist":"放課後ティータイム","yearsOwned":5.5,"genre":"Anime"},
+    {"name":"My Soul, Your Beats!","artist":"LiSA","yearsOwned":5.4,"genre":"Anime"},
+    {"name":"紅蓮の弓矢","artist":"Linked Horizon","yearsOwned":5.3,"genre":"Anime"},
+    {"name":"Snow halation","artist":"μ’s","yearsOwned":5.4,"genre":"Anime"},
+    {"name":"Don’t say lazy","artist":"放課後ティータイム","yearsOwned":5.5,"genre":"Anime"},
+    {"name":"Cagayake! GIRLS","artist":"放課後ティータイム","yearsOwned":5.5,"genre":"Anime"}
+  ],
+  "countries": [
+    {
+      "code":"US","name":"United States","artistCount":113,
+      "lat":39.5,"lng":-98.35,
+      "blurb":"The biggest column, but not the dominant voice. American artists are split across pop, indie, jazz, hip-hop — wide rather than deep.",
+      "top":[{"artist":"Nujabes","plays":186,"note":"Hip-Hop · the deep 2025 dive"},{"artist":"Herb Alpert &amp; The Tijuana Brass","plays":138,"note":"Jazz · the 2024 detour"},{"artist":"Edgar Meyer · Stuart Duncan · 马友友","plays":92,"note":"Classical chamber"}]
+    },
+    {
+      "code":"JP","name":"Japan","artistCount":56,
+      "lat":36.2,"lng":138.25,
+      "blurb":"27% of your total plays trace back here. Anime soundtracks brought you in; Shōwa city pop kept you. The second home of the library.",
+      "top":[{"artist":"Eiichi Otaki / 大瀧詠一","plays":262,"note":"City pop, 1970s–80s"},{"artist":"Utada","plays":199,"note":"J-Pop"},{"artist":"AQUAPLUS","plays":136,"note":"Anime soundtrack"}]
+    },
+    {
+      "code":"GB","name":"United Kingdom","artistCount":34,
+      "lat":54.0,"lng":-2.0,
+      "blurb":"British pop is your single-track obsession lane. Harry Styles, Adele, Queen — fewer artists, but the playlists they own go deep.",
+      "top":[{"artist":"Harry Styles","plays":252,"note":"5 of your top 20 tracks"},{"artist":"Adele","plays":173,"note":""},{"artist":"Queen","plays":137,"note":"Two top-32 tracks"}]
+    },
+    {
+      "code":"AU","name":"Australia","artistCount":11,
+      "lat":-25.3,"lng":133.8,
+      "blurb":"Two Australians own large fractions of the library. Sia is your #1 by plays; Tame Impala carried a 2024 vein.",
+      "top":[{"artist":"Sia Furler","plays":361,"note":"#1 artist · the steady foundation"},{"artist":"Tame Impala","plays":168,"note":"Alternative · 2024 dive"},{"artist":"AC/DC","plays":14,"note":""}]
+    },
+    {
+      "code":"SE","name":"Sweden","artistCount":14,
+      "lat":60.1,"lng":18.6,
+      "blurb":"One name. Avicii. 352 plays — a posthumous catalog that you keep going back to.",
+      "top":[{"artist":"Avicii","plays":352,"note":"#2 artist · finite catalog"},{"artist":"Alesso &amp; Marshmello","plays":20,"note":""},{"artist":"Mike Perry","plays":13,"note":""}]
+    },
+    {
+      "code":"TW","name":"Taiwan","artistCount":7,
+      "lat":23.7,"lng":121.0,
+      "blurb":"A small but committed slice. 告五人 and 周杰倫 anchor the Mandopop column.",
+      "top":[{"artist":"告五人","plays":55,"note":"Britpop in Mandarin"},{"artist":"周杰倫","plays":37,"note":""},{"artist":"陶喆","plays":23,"note":""}]
+    },
+    {
+      "code":"CN","name":"Mainland China","artistCount":11,
+      "lat":35.0,"lng":104.0,
+      "blurb":"Indie pop and a handful of legacy Mandopop. 橘子海 — a Britpop-flavored Chinese band — leads the column.",
+      "top":[{"artist":"橘子海","plays":67,"note":""},{"artist":"阿肆","plays":19,"note":""},{"artist":"王菲","plays":15,"note":""}]
+    },
+    {
+      "code":"BY","name":"Belarus","artistCount":1,
+      "lat":53.7,"lng":27.95,
+      "blurb":"One band. Molchat Doma. Post-punk in Russian, dropped in once in 2022 and never re-explored — but the plays held.",
+      "top":[{"artist":"Molchat Doma","plays":63,"note":"Post-punk · 2022 trigger"}]
+    },
+    {
+      "code":"EC","name":"Ecuador","artistCount":1,
+      "lat":-1.8,"lng":-78.18,
+      "blurb":"One unexpected entry. Leo Rojas, the pan-flute virtuoso — 129 plays, added during the 2021 sweep.",
+      "top":[{"artist":"Leo Rojas","plays":129,"note":"Andean instrumental"}]
+    }
+  ],
+  "clusters": [
+    {"name":"Anglo-American mainstream","percent":46.2},
+    {"name":"Japanese (J-Pop · Anime · City Pop)","percent":27.0},
+    {"name":"Electronic · Dance","percent":14.5},
+    {"name":"Classical · Instrumental","percent":6.4},
+    {"name":"Other","percent":5.9}
+  ],
+  "playlists": {
+    "forgotten-awakening": {
+      "title": "Forgotten Awakening",
+      "desc": "Eight tracks you brought home and never opened. Curated to skip the 2020 anime binge that no longer fits.",
+      "tracks": [
+        {"name":"カナリア諸島にて","artist":"Eiichi Otaki"},
+        {"name":"Velvet Motel","artist":"Eiichi Otaki"},
+        {"name":"真夜中のドア / Stay With Me","artist":"松原みき"},
+        {"name":"Sanctuary Ship","artist":"Nujabes"},
+        {"name":"Tinted Eyes","artist":"Nujabes"},
+        {"name":"夜に駆ける","artist":"YOASOBI"},
+        {"name":"アイドル","artist":"YOASOBI"},
+        {"name":"Plastic Love","artist":"竹内まりや"}
+      ]
+    },
+    "recent-vein": {
+      "title": "Recent Vein",
+      "desc": "Following the line you’re drawing now — Nujabes downstream into Japanese hip-hop, plus the recent SZA / Mac DeMarco coda.",
+      "tracks": [
+        {"name":"Luv(sic) pt 3 (feat. Shing02)","artist":"Nujabes"},
+        {"name":"Aruarian Dance","artist":"Nujabes"},
+        {"name":"Feather (feat. Cise Starr &amp; Akin)","artist":"Nujabes"},
+        {"name":"Counting Stars (feat. Shing02)","artist":"Nomak"},
+        {"name":"Pharaoh Symbol","artist":"RHYMESTER"},
+        {"name":"Chamber of Reflection","artist":"Mac DeMarco"},
+        {"name":"Save The Day (From “Hoppers”)","artist":"SZA"},
+        {"name":"DAISIES","artist":"Justin Bieber"}
+      ]
+    },
+    "obsession-replay": {
+      "title": "Obsession Replay",
+      "desc": "Your ten most-replayed tracks, restored to a single sitting. The library’s loudest signals, in order.",
+      "tracks": [
+        {"name":"Golden","artist":"Harry Styles"},
+        {"name":"Watermelon Sugar","artist":"Harry Styles"},
+        {"name":"Adore You","artist":"Harry Styles"},
+        {"name":"Under Pressure (feat. David Bowie)","artist":"Queen"},
+        {"name":"I Want To Break Free","artist":"Queen"},
+        {"name":"Lights Up","artist":"Harry Styles"},
+        {"name":"おもかげ (produced by Vaundy)","artist":"milet, Aimer &amp; Lilas Ikuta"},
+        {"name":"Snowman","artist":"Sia Furler"},
+        {"name":"Velvet Motel","artist":"Eiichi Otaki"},
+        {"name":"カナリア諸島にて","artist":"Eiichi Otaki"}
+      ]
+    }
+  }
+}
+</script>
+
+<script>
+/* ================================================================
+   THEME — default follows system, persists only within session
+   ================================================================ */
+(function initTheme() {
+  const root = document.documentElement;
+  const mql  = window.matchMedia('(prefers-color-scheme: dark)');
+  const setTheme = (t) => {
+    root.setAttribute('data-theme', t);
+    if (window.__onThemeChange) window.__onThemeChange(t);
+  };
+  setTheme(mql.matches ? 'dark' : 'light');
+  // follow system if user hasn't overridden
+  mql.addEventListener('change', e => {
+    if (!root.dataset.userOverride) setTheme(e.matches ? 'dark' : 'light');
+  });
+  document.getElementById('themeToggle').addEventListener('click', () => {
+    const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    root.dataset.userOverride = '1';
+    setTheme(next);
+  });
+})();
+
+const DATA = JSON.parse(document.getElementById('DATA').textContent);
+
+/* ================================================================
+   S2 — render top artist / top track lists
+   ================================================================ */
+(function renderObsession() {
+  const wrapA = document.getElementById('top-artists-list');
+  const wrapT = document.getElementById('top-tracks-list');
+  const isHighlightArtist = a => ['Sia Furler','Avicii','Nujabes','Harry Styles','Eiichi Otaki / 大瀧詠一'].includes(a);
+
+  DATA.topArtists.forEach((a, i) => {
+    const row = document.createElement('div');
+    row.className = 'rank-row' + (isHighlightArtist(a.artist) ? ' is-highlight' : '');
+    row.innerHTML = `
+      <span class="rank-num">${String(i+1).padStart(2,'0')}</span>
+      <span>
+        <span class="primary-line">${a.artist}</span>
+        ${a.highlight ? `<span class="secondary-line">${a.highlight}</span>` : ''}
+      </span>
+      <span class="plays">${a.plays}<small>plays</small></span>
+    `;
+    wrapA.appendChild(row);
+  });
+
+  DATA.topTracks.forEach((t, i) => {
+    const row = document.createElement('div');
+    row.className = 'rank-row' + (t.artist === 'Harry Styles' ? ' is-highlight' : '');
+    row.innerHTML = `
+      <span class="rank-num">${String(i+1).padStart(2,'0')}</span>
+      <span>
+        <span class="primary-line">${t.name}</span>
+        <span class="secondary-line">${t.artist}</span>
+      </span>
+      <span class="plays">${t.plays}<small>plays</small></span>
+    `;
+    wrapT.appendChild(row);
+  });
+})();
+
+/* ================================================================
+   S3 — Timeline: render events, axis, sticky-scroll sync
+   ================================================================ */
+(function renderTimeline() {
+  const stream = document.getElementById('tl-stream');
+  const axis   = document.getElementById('tl-axis-years');
+  const nowat  = document.getElementById('tl-nowat');
+
+  // event cards
+  DATA.timeline.forEach((ev, i) => {
+    const [yr, mo] = ev.month.split('-');
+    const monthName = new Date(`${yr}-${mo}-01`).toLocaleString('en-US', { month: 'short' });
+    const node = document.createElement('article');
+    node.className = 'tl-event reveal';
+    node.dataset.year = yr;
+    node.dataset.month = ev.month;
+    node.dataset.title = ev.title;
+    node.innerHTML = `
+      <div class="tl-event__when">
+        ${monthName}
+        <span class="yr">${yr}</span>
+      </div>
+      <div class="tl-event__body">
+        <h3>${ev.title}</h3>
+        <p>${ev.note}</p>
+        <div class="tl-event__pills">
+          ${ev.pills.map(p => `<span class="pill${p.toLowerCase().includes('peak') ? ' pill-coral' : ''}">${p}</span>`).join('')}
+        </div>
+      </div>
+    `;
+    stream.appendChild(node);
+  });
+
+  // axis years — evenly distributed
+  const years = ['2020','2021','2022','2023','2024','2025','2026'];
+  years.forEach(y => {
+    const d = document.createElement('div');
+    d.className = 'tl-axis__year';
+    d.dataset.year = y;
+    d.textContent = y;
+    axis.appendChild(d);
+  });
+
+  // observe events to update axis + nowat
+  const events = [...stream.querySelectorAll('.tl-event')];
+  const yearDots = [...axis.querySelectorAll('.tl-axis__year')];
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const yr = e.target.dataset.year;
+        yearDots.forEach(d => d.classList.toggle('is-active', d.dataset.year === yr));
+        nowat.textContent = `${yr} · ${e.target.dataset.title}`;
+      }
+    });
+  }, { rootMargin: '-45% 0px -45% 0px', threshold: 0 });
+  events.forEach(e => io.observe(e));
+})();
+
+/* ================================================================
+   S4 — render forgotten ghost rows
+   ================================================================ */
+(function renderForgotten() {
+  const wrap = document.getElementById('ghost-list');
+  DATA.ghostTracks.forEach(t => {
+    const row = document.createElement('div');
+    row.className = 'ghost-row';
+    row.innerHTML = `
+      <div class="ghost-row__name">${t.name}<small>${t.artist} · ${t.genre}</small></div>
+      <div class="ghost-row__age">${t.yearsOwned.toFixed(1)} yrs · unplayed</div>
+    `;
+    wrap.appendChild(row);
+  });
+})();
+
+/* ================================================================
+   S5 — Globe + country narrative
+   ================================================================ */
+let GLOBE = null;
+let GLOBE_LABEL_EL = null;
+(function renderGeography() {
+  const narrative = document.getElementById('geo-narrative');
+  const cluster   = document.getElementById('cluster-strip');
+  GLOBE_LABEL_EL  = document.getElementById('globe-label');
+
+  // country cards
+  DATA.countries.forEach((c, i) => {
+    const card = document.createElement('article');
+    card.className = 'country-card' + (i === 0 ? ' is-active' : '');
+    card.dataset.code = c.code;
+    card.dataset.lat = c.lat;
+    card.dataset.lng = c.lng;
+    card.innerHTML = `
+      <div class="country-card__flag">
+        <span class="code">${c.code}</span>
+        <span>${c.artistCount} artists</span>
+      </div>
+      <h3>${c.name}</h3>
+      <p>${c.blurb}</p>
+      <div class="top-artists">
+        ${c.top.map(t => `
+          <div class="row">
+            <span><strong>${t.artist}</strong>${t.note ? ` · <span style="color:var(--muted)">${t.note}</span>` : ''}</span>
+            <span class="plays">${t.plays}</span>
+          </div>
+        `).join('')}
+      </div>
+    `;
+    narrative.appendChild(card);
+  });
+
+  // cluster tiles
+  DATA.clusters.forEach(cl => {
+    const t = document.createElement('div');
+    t.className = 'cluster-tile';
+    t.innerHTML = `<div class="pct">${cl.percent}%</div><div class="lbl">${cl.name}</div>`;
+    cluster.appendChild(t);
+  });
+
+  // globe init
+  initGlobe();
+
+  // sync card scroll → globe POV
+  const cards = [...narrative.querySelectorAll('.country-card')];
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        cards.forEach(c => c.classList.toggle('is-active', c === e.target));
+        const lat = parseFloat(e.target.dataset.lat);
+        const lng = parseFloat(e.target.dataset.lng);
+        const code = e.target.dataset.code;
+        const country = DATA.countries.find(c => c.code === code);
+        if (GLOBE) GLOBE.pointOfView({ lat, lng, altitude: 1.8 }, 1100);
+        GLOBE_LABEL_EL.textContent = country.name;
+        GLOBE_LABEL_EL.classList.add('is-on');
+      }
+    });
+  }, { rootMargin: '-45% 0px -45% 0px', threshold: 0 });
+  cards.forEach(c => io.observe(c));
+})();
+
+function getGlobeColors() {
+  const cs = getComputedStyle(document.documentElement);
+  return {
+    water:    cs.getPropertyValue('--globe-water').trim(),
+    land:     cs.getPropertyValue('--globe-land').trim(),
+    marker:   cs.getPropertyValue('--globe-marker').trim(),
+    atmosphere: cs.getPropertyValue('--globe-atmosphere').trim()
+  };
+}
+
+function initGlobe() {
+  const container = document.getElementById('globe');
+  if (!container || typeof Globe === 'undefined') return;
+  const colors = getGlobeColors();
+
+  // points dataset — small flat dots, not pillars
+  const points = DATA.countries.map(c => ({
+    lat: c.lat, lng: c.lng,
+    weight: Math.max(1, Math.log2(c.artistCount + 1)),
+    color: colors.marker,
+    name: c.name
+  }));
+
+  GLOBE = Globe()(container)
+    .backgroundColor('rgba(0,0,0,0)')
+    .showAtmosphere(true)
+    .atmosphereColor(colors.atmosphere)
+    .atmosphereAltitude(0.22)
+    .showGlobe(true)
+    .globeImageUrl(null)
+    .pointsData(points)
+    .pointLat('lat')
+    .pointLng('lng')
+    .pointAltitude(0.012)
+    .pointRadius(d => 0.5 + d.weight * 0.18)
+    .pointColor('color')
+    .pointResolution(20)
+    .pointsMerge(false)
+    // rings for emphasis
+    .ringsData(points)
+    .ringLat('lat')
+    .ringLng('lng')
+    .ringColor(() => () => `rgba(204,120,92,0.55)`)
+    .ringMaxRadius(d => 2 + d.weight * 0.6)
+    .ringPropagationSpeed(1.4)
+    .ringRepeatPeriod(2200)
+    .ringAltitude(0.012);
+
+  // try multiple geojson sources for land polygons
+  const geoSources = [
+    'https://unpkg.com/three-globe@2.31.1/example/datasets/ne_110m_admin_0_countries.geojson',
+    'https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_110m_admin_0_countries.geojson'
+  ];
+  (async () => {
+    for (const url of geoSources) {
+      try {
+        const r = await fetch(url);
+        if (!r.ok) continue;
+        const geo = await r.json();
+        GLOBE
+          .polygonsData(geo.features)
+          .polygonCapColor(() => colors.land)
+          .polygonSideColor(() => 'rgba(0,0,0,0)')
+          .polygonStrokeColor(() => 'rgba(0,0,0,0)')
+          .polygonAltitude(0.006);
+        return;
+      } catch (e) {}
+    }
+  })();
+
+  // set initial color (canvas + scene background)
+  GLOBE.scene().background = null;
+  GLOBE.renderer().setClearColor(0x000000, 0);
+
+  // set globe material color (the sphere)
+  const globeMaterial = GLOBE.globeMaterial();
+  globeMaterial.color.set(colors.water);
+  globeMaterial.transparent = false;
+
+  // auto rotate
+  const controls = GLOBE.controls();
+  controls.autoRotate = true;
+  controls.autoRotateSpeed = 0.4;
+  controls.enableZoom = false;
+
+  // initial POV: US
+  GLOBE.pointOfView({ lat: DATA.countries[0].lat, lng: DATA.countries[0].lng, altitude: 2.2 });
+
+  // resize handler
+  function resize() {
+    const rect = container.getBoundingClientRect();
+    GLOBE.width(rect.width).height(rect.height);
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  // re-skin on theme change
+  window.__onThemeChange = function () {
+    const c = getGlobeColors();
+    GLOBE.globeMaterial().color.set(c.water);
+    GLOBE.atmosphereColor(c.atmosphere);
+    if (GLOBE.polygonsData && GLOBE.polygonsData().length) {
+      GLOBE.polygonCapColor(() => c.land);
+    }
+    GLOBE.pointColor(() => c.marker);
+  };
+}
+
+/* ================================================================
+   S7 — Playlists: tabs, checkboxes, AppleScript generator, copy
+   ================================================================ */
+(function renderPlaylists() {
+  const panels = document.getElementById('tabpanels');
+  const tabs   = [...document.querySelectorAll('.tab')];
+  const codeWindow = document.getElementById('codeWindow');
+  const codeBody   = document.getElementById('codeBody');
+  const copyBtn    = document.getElementById('copyBtn');
+
+  // build panels
+  Object.entries(DATA.playlists).forEach(([key, pl], idx) => {
+    const panel = document.createElement('div');
+    panel.className = 'tabpanel' + (idx === 0 ? ' is-active' : '');
+    panel.dataset.tab = key;
+    panel.innerHTML = `
+      <div class="tabpanel__head">
+        <div>
+          <h3>${pl.title}</h3>
+          <p>${pl.desc}</p>
+        </div>
+      </div>
+      <div class="track-list">
+        ${pl.tracks.map((t, i) => `
+          <div class="track-row">
+            <input type="checkbox" id="${key}-${i}" data-key="${key}" checked>
+            <label for="${key}-${i}" class="track-row__main" style="display:flex;flex-direction:column;cursor:pointer;">
+              <span class="track-row__name">${t.name}</span>
+              <span class="track-row__artist">${t.artist}</span>
+            </label>
+            <span class="track-row__meta">${String(i+1).padStart(2,'0')}</span>
+          </div>
+        `).join('')}
+      </div>
+      <div class="playlist-actions">
+        <button class="btn-primary" data-action="generate" data-key="${key}">Generate AppleScript</button>
+        <button class="btn-secondary" data-action="toggle-all" data-key="${key}">Toggle all</button>
+        <span class="selection-count" data-count="${key}">${pl.tracks.length} of ${pl.tracks.length} selected</span>
+      </div>
+    `;
+    panels.appendChild(panel);
+  });
+
+  // tab switching
+  tabs.forEach(t => t.addEventListener('click', () => {
+    const k = t.dataset.tab;
+    tabs.forEach(x => x.classList.toggle('is-active', x === t));
+    [...panels.querySelectorAll('.tabpanel')].forEach(p => p.classList.toggle('is-active', p.dataset.tab === k));
+    codeWindow.classList.remove('is-open');
+  }));
+
+  // checkbox count
+  panels.addEventListener('change', e => {
+    if (e.target.type === 'checkbox') {
+      const k = e.target.dataset.key;
+      const total = DATA.playlists[k].tracks.length;
+      const sel = panels.querySelectorAll(`input[type=checkbox][data-key="${k}"]:checked`).length;
+      panels.querySelector(`[data-count="${k}"]`).textContent = `${sel} of ${total} selected`;
+    }
+  });
+
+  // action buttons
+  panels.addEventListener('click', e => {
+    const btn = e.target.closest('[data-action]');
+    if (!btn) return;
+    const key = btn.dataset.key;
+
+    if (btn.dataset.action === 'toggle-all') {
+      const boxes = panels.querySelectorAll(`input[type=checkbox][data-key="${key}"]`);
+      const anyUnchecked = [...boxes].some(b => !b.checked);
+      boxes.forEach(b => b.checked = anyUnchecked);
+      const total = DATA.playlists[key].tracks.length;
+      const sel = anyUnchecked ? total : 0;
+      panels.querySelector(`[data-count="${key}"]`).textContent = `${sel} of ${total} selected`;
+      return;
+    }
+
+    if (btn.dataset.action === 'generate') {
+      const pl = DATA.playlists[key];
+      const selected = [...panels.querySelectorAll(`input[type=checkbox][data-key="${key}"]:checked`)]
+        .map(b => pl.tracks[parseInt(b.id.split('-').pop(),10)]);
+      if (!selected.length) {
+        codeBody.textContent = '-- No tracks selected.';
+        codeWindow.classList.add('is-open');
+        codeWindow.scrollIntoView({ behavior:'smooth', block:'center' });
+        return;
+      }
+      codeBody.textContent = buildAppleScript(pl.title, selected);
+      codeWindow.classList.add('is-open');
+      codeWindow.scrollIntoView({ behavior:'smooth', block:'center' });
+    }
+  });
+
+  copyBtn.addEventListener('click', () => {
+    navigator.clipboard.writeText(codeBody.textContent).then(() => {
+      copyBtn.classList.add('is-copied');
+      copyBtn.textContent = 'Copied';
+      setTimeout(() => { copyBtn.classList.remove('is-copied'); copyBtn.textContent = 'Copy'; }, 1600);
+    });
+  });
+
+  function escAS(s) {
+    // escape for AppleScript double-quoted string
+    return String(s).replace(/\\/g,'\\\\').replace(/"/g,'\\"');
+  }
+
+  function buildAppleScript(title, tracks) {
+    const stamped = `${title} · ${new Date().toISOString().slice(0,10)}`;
+    const lines = [];
+    lines.push('-- Apple Music playlist generator');
+    lines.push(`-- ${stamped}`);
+    lines.push(`-- ${tracks.length} track${tracks.length===1?'':'s'}`);
+    lines.push('');
+    lines.push('tell application "Music"');
+    lines.push('  activate');
+    lines.push(`  set plName to "${escAS(stamped)}"`);
+    lines.push('  if (exists user playlist plName) then');
+    lines.push('    set targetPlaylist to user playlist plName');
+    lines.push('    try');
+    lines.push('      delete every track of targetPlaylist');
+    lines.push('    end try');
+    lines.push('  else');
+    lines.push('    set targetPlaylist to make new user playlist with properties {name:plName}');
+    lines.push('  end if');
+    lines.push('');
+    lines.push('  set notFound to {}');
+    tracks.forEach(t => {
+      lines.push(`  -- ${t.name} — ${t.artist.replace(/&amp;/g,'&')}`);
+      lines.push(`  set trackName to "${escAS(t.name.replace(/&amp;/g,'&'))}"`);
+      lines.push(`  set artistName to "${escAS(t.artist.replace(/&amp;/g,'&'))}"`);
+      lines.push('  set foundTracks to (every track of library playlist 1 whose name is trackName and artist is artistName)');
+      lines.push('  if (count of foundTracks) > 0 then');
+      lines.push('    duplicate (item 1 of foundTracks) to targetPlaylist');
+      lines.push('  else');
+      lines.push('    set end of notFound to trackName & " — " & artistName');
+      lines.push('  end if');
+    });
+    lines.push('');
+    lines.push('  reveal targetPlaylist');
+    lines.push('  if (count of notFound) > 0 then');
+    lines.push('    display dialog "Created playlist with " & (count of tracks of targetPlaylist) & " tracks. " & (count of notFound) & " not found in library."');
+    lines.push('  end if');
+    lines.push('end tell');
+    return lines.join('\n');
+  }
+})();
+
+/* ================================================================
+   Global reveal-on-scroll
+   ================================================================ */
+(function reveal() {
+  const els = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); }
+    });
+  }, { rootMargin: '0px 0px -10% 0px', threshold: 0.05 });
+  els.forEach(el => io.observe(el));
+})();
+
+</script>
+</body>
+</html>
