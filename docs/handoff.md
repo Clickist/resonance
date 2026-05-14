@@ -1,6 +1,6 @@
 # Handoff — Apple Music Library Editorial Report
 
-This is a handoff for a fresh Claude window picking up work on `report.html`. The previous window's context was getting long. Everything in this doc is true as of commit `a56f71d`.
+This is a handoff for a fresh Claude window picking up work on `report.html`. The previous window's context was getting long. Everything in this doc is true as of commit `b232f53`.
 
 ## What this project is
 
@@ -79,7 +79,7 @@ The user is **Clickist** — a developer + content creator. They prefer Chinese 
 - Display-serif headline ("Your play count is a diary you never meant to publish.") at clamp(36, 5.4vw, 64px), 3 lines on desktop
 - Italic body-lead paragraph below
 - Right side: full coral now-card (matches S4 callout treatment) showing the most recently added track (Mac DeMarco / Chamber of Reflection)
-- Now-card has a 56px album thumb in the head, left of track-name + artist (since `a56f71d`). Translucent white inner-ring (`color-mix(in srgb, var(--on-primary) 22%, transparent)`) + soft drop shadow defines it against coral.
+- Now-card has a 56px album thumb in the head, **right** of track-name + artist (moved to the right in `b232f53` per user preference; was initially on the left). The title block has `flex: 1` to push the thumb against the card's right edge. Translucent white inner-ring (`color-mix(in srgb, var(--on-primary) 22%, transparent)`) + soft drop shadow defines it against coral.
 - Meta-strip below: 4 stats in a full-width row with a hairline above
 - Hero container capped at 1150px (other sections use 1200px) so the diptych reads centered
 
@@ -179,6 +179,8 @@ Other theme-aware tokens that matter:
 ## Commit history (most recent first)
 
 ```
+b232f53  Perf: pause Globe offscreen, drop nav backdrop-filter past hero
+7f23fe9  Update handoff to a56f71d state
 a56f71d  Album covers across S1/S2/S4/S7; rebuild S7 playlists from real data
 6f661d8  Drop chapter eyebrows; rename Taiwan to Chinese Taiwan
 bb1842d  S5 geography: coral code chip, serif label, paint active country
@@ -196,11 +198,12 @@ cdb9207  S1 hero rebalance + warmer cream stack
 
 ## What's likely next
 
-The user works section-by-section, top-to-bottom. So far we've polished S1, S3, S4, S5 in depth, and rebuilt S7's data + added covers across S1/S2/S4/S7. Likely next:
+User explicitly **parked** these three after the perf-audit pass (2026-05-15) and said "记入 handoff 不着急" — so all three are queued, none urgent. Address only when the user surfaces them again.
 
-- **S2 (Obsession Archive)** — covers added, but rank rows / editorial annotations / `is-highlight` coral usage are otherwise still in their initial form. The user may want to revisit visual rhythm here.
-- **S6 (Portrait)** — completely untouched. The trait cards (30% / 27% / 0) and the editorial paragraphs may want a fresh look.
-- **Vendor globe assets locally** — *deferred per user* (memory tracks this). three.js + globe.gl + geojson currently load from unpkg + github raw. User wants to do this "在最后" (at the end). The fix doesn't address WebGL availability (separate concern — see S5 above), but does protect against unpkg outages. Note: vendoring breaks the "single file" property if files are added — discuss with the user whether to accept multi-file delivery or base64-inline the geojson (~150KB acceptable, scripts are larger).
+- **S2 (Obsession Archive)** visual polish — covers added (44px thumbs in top-tracks), but rank rows / editorial annotations / `is-highlight` coral usage are still in their initial form. Candidates for revisit: rank-num typographic weight against thumb, annotation block layout, the hardcoded highlight-artist list (Sia / Avicii / Nujabes / Harry Styles / Otaki) at L1822.
+- **S6 (Portrait)** visual polish — completely untouched. 3 trait cards (30% / 27% / 0) and 3 closing editorial paragraphs. Mostly typographic and rhythm work; the data is fine.
+- **Vendor globe assets locally** — three.js + globe.gl + geojson currently load from unpkg + github raw. User explicitly said "到最后再来解决" (memory `project-vendor-globe` tracks this). Trigger when the user says "收尾" / "vendoring" / "globe 还是不稳". Notes: (a) does NOT solve WebGL-disabled-browser issues (separate fallback path already exists, do not remove); (b) breaks the "single file" property if files are added — discuss with user whether to accept multi-file delivery or base64-inline the geojson (~150KB acceptable, scripts are larger).
+- **Remaining perf opportunities (audit-surfaced, not acted on)** — the 2026-05-15 perf audit identified two more medium-impact wins that the user chose NOT to do in the current pass. Surface again only if perf complaints return. (a) **Smaller cover variants** — all 48 album thumbs request `600x600bb.jpg` (~56 KB ea) but render at 40-56 CSS px. Swapping to `200x200bb.jpg` (~12 KB) cuts total artwork transfer from ~2.7 MB to ~580 KB. One regex substitution across the inline DATA. Keep the hero now-card at 600 (only 1 image, dominant visual). (b) **Globe polygon re-render efficiency** — every country-card IO callback creates a new arrow function for `polygonCapColor`, which makes globe.gl re-evaluate the accessor for all ~177 polygons. Could bind the accessor once and mutate state via a closure. Medium impact, mostly noticeable during fast scroll through S5.
 
 ## Gotchas / non-obvious things
 
@@ -208,6 +211,8 @@ The user works section-by-section, top-to-bottom. So far we've polished S1, S3, 
 - **`ACTIVE_COUNTRY_CODE`** is a module-level `let` captured by the polygon color accessor. The accessor is re-set inside the IntersectionObserver to force globe.gl to re-render. If you change how the accessor is set, make sure both the initial load AND the scroll handler set it via the same pattern.
 - **Globe CDN dependencies** — three.js + globe.gl + geojson all load from unpkg. If the user's proxy/VPN goes down, the globe will be a blank black sphere with `ERR_PROXY_CONNECTION_FAILED` in the console. This is not a code bug. See "What's likely next" for the vendoring task.
 - **WebGL probe** — `initGlobe()` does a quick `canvas.getContext('webgl')` test. If null, sets `#globe.is-fallback` and returns early. **Don't remove this probe** — without it, an uncaught throw in three.js's WebGLRenderer constructor will kill the rest of the inline script (including S6/S7 rendering). Confirmed in 2026-05-14: a user with hardware acceleration disabled hit this exact path.
+- **Globe pause when offscreen** (since `b232f53`) — `watchGlobeVisibility` IIFE near the end of the script observes `.geo-stage` and calls `GLOBE.pauseAnimation()` / `resumeAnimation()` + toggles `controls.autoRotate`. **Don't remove or simplify** — globe.gl's rAF loop is the dominant idle GPU cost and was directly responsible for the user's laptop fan running constantly. The feature-detect on pauseAnimation is intentional (so an older bundled globe.gl version degrades gracefully). The `if (!GLOBE) return` guard at top is what makes this safe in the WebGL-fallback path.
+- **Top-nav `is-scrolled` class** (since `b232f53`) — a passive scroll listener with rAF throttling toggles `.is-scrolled` on `.top-nav` past 80px. The class removes `backdrop-filter` and switches to opaque `var(--canvas)` background. **Don't drop this** — backdrop-filter: blur(12px) was the second-largest scroll-time cost. The glassy nav is preserved over the hero (good aesthetic) and dropped during reading (good perf). The 80px threshold sits well within the hero region.
 - **`.tl-axis__nowat`** card has `min-height: 100px` to lock its 2-line footprint. Don't remove this — without it, the year markers above redistribute on every scroll-in.
 - **Ghost list top border** is per-column via `:nth-child(-n+2)` because the parent's full-width `border-top` would cross the column-gap and look wrong with the segmented bottoms.
 - **Coral on coral**: don't put coral text on the coral hero card or S4 callout. White-with-opacity (`color-mix(in srgb, var(--on-primary) 80%, transparent)`) is the secondary-text pattern there.
