@@ -79,7 +79,7 @@
   --code-fg-soft:        #a09d96;
 
   --globe-water:         #efe9de;
-  --globe-land:          #181715;
+  --globe-land:          #3d3d3a;
   --globe-marker:        #cc785c;
   --globe-atmosphere:    #cc785c;
 
@@ -1999,9 +1999,7 @@ function initGlobe() {
 
   GLOBE = Globe()(container)
     .backgroundColor('rgba(0,0,0,0)')
-    .showAtmosphere(true)
-    .atmosphereColor(colors.atmosphere)
-    .atmosphereAltitude(0.22)
+    .showAtmosphere(false)
     .showGlobe(true)
     .globeImageUrl(null)
     .pointsData(points)
@@ -2074,7 +2072,6 @@ function initGlobe() {
   window.__onThemeChange = function () {
     const c = getGlobeColors();
     GLOBE.globeMaterial().color.set(c.water);
-    GLOBE.atmosphereColor(c.atmosphere);
     if (GLOBE.polygonsData && GLOBE.polygonsData().length) {
       GLOBE.polygonCapColor(() => c.land).polygonStrokeColor(() => c.stroke);
     }
