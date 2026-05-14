@@ -151,7 +151,7 @@ button { font: inherit; cursor: pointer; }
   font-weight: 400;
   color: var(--ink);
 }
-.t-display-xl { font-size: clamp(40px, 6.4vw, 80px); line-height: 1.04; letter-spacing: -1.8px; }
+.t-display-xl { font-size: clamp(36px, 5.4vw, 64px); line-height: 1.06; letter-spacing: -1.4px; }
 .t-display-lg { font-size: clamp(36px, 4.6vw, 56px); line-height: 1.08; letter-spacing: -1.2px; }
 .t-display-md { font-size: clamp(28px, 3.2vw, 40px); line-height: 1.14; letter-spacing: -0.6px; }
 .t-display-sm { font-size: clamp(22px, 2.4vw, 30px); line-height: 1.2;  letter-spacing: -0.3px; }
@@ -307,9 +307,14 @@ section { position: relative; }
   padding-top: var(--s-sec);
   padding-bottom: var(--s-sec);
 }
+/* Hero sits in a narrower inset than the rest of the page so the
+   headline + card pair reads as a centered diptych rather than two
+   edge-anchored blocks. Meta-strip below shares the same inset
+   so the hairline aligns with the left column. */
+.hero > .container { max-width: 1150px; }
 .hero__grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.95fr);
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
   gap: var(--s-xxl);
   align-items: center;
 }
@@ -355,43 +360,27 @@ section { position: relative; }
 .now-card {
   background: var(--primary);
   color: var(--on-primary);
-  border-radius: var(--r-xl);
+  border-radius: var(--r-lg);
   padding: var(--s-xl);
   border: 0;
   position: relative;
   overflow: hidden;
   box-shadow: var(--shadow-card);
 }
-.now-card .label {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  gap: var(--s-xs);
-  font: 500 12px/1 var(--ff-body);
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  color: color-mix(in srgb, var(--on-primary) 80%, transparent);
-  margin-bottom: var(--s-lg);
-}
-.now-card .label::before {
-  content: "";
-  width: 6px; height: 6px; border-radius: 50%;
-  background: var(--on-primary);
-}
 .now-card .track-name {
   position: relative;
   font-family: var(--ff-display);
-  font-size: clamp(26px, 3vw, 36px);
+  font-size: clamp(26px, 2.9vw, 36px);
   line-height: 1.12;
   color: var(--on-primary);
   letter-spacing: -0.4px;
-  margin: 0 0 var(--s-xs);
+  margin: 0 0 var(--s-xxs);
 }
 .now-card .track-artist {
   position: relative;
   font: 500 16px/1.4 var(--ff-body);
   color: var(--on-primary);
-  margin: 0 0 var(--s-lg);
+  margin: 0 0 var(--s-md);
 }
 .now-card .footnote {
   position: relative;
@@ -1259,7 +1248,6 @@ section { position: relative; }
       </div>
 
       <aside class="now-card reveal delay-1" aria-label="Most recently added">
-        <div class="label">Most recently added</div>
         <h2 class="track-name" id="recent-name">Chamber of Reflection</h2>
         <p class="track-artist" id="recent-artist">Mac DeMarco</p>
         <p class="footnote">
