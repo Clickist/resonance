@@ -242,6 +242,15 @@ section { position: relative; }
   align-items: center;
   transition: background-color .35s ease, border-color .35s ease;
 }
+/* After the user scrolls past the hero, drop the backdrop-filter
+   entirely — it's the single most expensive thing on this page
+   during scroll. The background goes opaque so the underlying blur
+   is no longer needed. Toggled via JS by adding .is-scrolled. */
+.top-nav.is-scrolled {
+  background: var(--canvas);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
 .top-nav__inner {
   width: 100%;
   max-width: 1200px;
@@ -373,7 +382,7 @@ section { position: relative; }
   box-shadow: 0 0 0 1px color-mix(in srgb, var(--on-primary) 22%, transparent),
               0 4px 14px rgba(0, 0, 0, 0.12);
 }
-.now-card__title { min-width: 0; }
+.now-card__title { min-width: 0; flex: 1; }
 
 .now-card .track-name {
   position: relative;
@@ -1352,11 +1361,11 @@ a.track-thumb-link:hover { transform: translateY(-1px); }
 
       <aside class="now-card reveal delay-1" aria-label="Most recently added">
         <div class="now-card__head">
-          <img class="now-thumb" src="https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/4b/5c/83/4b5c833d-2160-bc68-0905-5b91d2b6732a/817949019495.jpg/600x600bb.jpg" alt="" loading="lazy">
           <div class="now-card__title">
             <h2 class="track-name" id="recent-name">Chamber of Reflection</h2>
             <p class="track-artist" id="recent-artist">Mac DeMarco</p>
           </div>
+          <img class="now-thumb" src="https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/4b/5c/83/4b5c833d-2160-bc68-0905-5b91d2b6732a/817949019495.jpg/600x600bb.jpg" alt="" loading="lazy">
         </div>
         <p class="footnote">
           Added <em id="recent-when">May 2026</em>. Right before it: <em>Save the Day</em> by SZA,
@@ -2366,6 +2375,62 @@ function initGlobeUnsafe(container) {
     lines.push('end tell');
     return lines.join('\n');
   }
+})();
+
+/* ================================================================
+   Performance — pause Globe when offscreen
+   ================================================================
+   Globe.gl runs an internal requestAnimationFrame loop at 60fps
+   continuously (autoRotate uses it). Without this observer the GPU
+   keeps drawing the hidden sphere even when the user is reading
+   S6/S7, which is the dominant cost on the page. We observe the
+   geo-stage container and pause/resume around it.
+
+   Safety: if WebGL probe failed earlier, GLOBE is null — we noop.
+   pauseAnimation/resumeAnimation are official globe.gl methods, but
+   we feature-detect anyway so an older bundled version doesn't
+   break us. autoRotate=false alone does NOT stop the render loop;
+   pauseAnimation does. */
+(function watchGlobeVisibility() {
+  const stage = document.querySelector('.geo-stage');
+  if (!stage || !GLOBE) return;
+  const canPause = typeof GLOBE.pauseAnimation === 'function' &&
+                   typeof GLOBE.resumeAnimation === 'function';
+  const io = new IntersectionObserver(([entry]) => {
+    if (entry.isIntersecting) {
+      try { GLOBE.controls().autoRotate = true; } catch (e) {}
+      if (canPause) GLOBE.resumeAnimation();
+    } else {
+      try { GLOBE.controls().autoRotate = false; } catch (e) {}
+      if (canPause) GLOBE.pauseAnimation();
+    }
+  }, { rootMargin: '200px 0px' });
+  io.observe(stage);
+})();
+
+/* ================================================================
+   Performance — drop top-nav backdrop-filter after scroll
+   ================================================================
+   backdrop-filter: blur(12px) gets recomputed on every scroll frame.
+   On integrated GPUs that's the second-largest cost after Globe.
+   We keep it for the hero (it's nice to have over the diptych) but
+   swap to an opaque nav once the user scrolls past it. The existing
+   transition: background-color .35s smooths the visual handoff. */
+(function navScrollState() {
+  const nav = document.querySelector('.top-nav');
+  if (!nav) return;
+  let ticking = false;
+  const update = () => {
+    nav.classList.toggle('is-scrolled', window.scrollY > 80);
+    ticking = false;
+  };
+  window.addEventListener('scroll', () => {
+    if (!ticking) {
+      requestAnimationFrame(update);
+      ticking = true;
+    }
+  }, { passive: true });
+  update();
 })();
 
 /* ================================================================
