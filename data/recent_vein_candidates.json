@@ -1,0 +1,217 @@
+{
+  "passed": [
+    {
+      "artist": "Shing02",
+      "track": "400 (Vocal)",
+      "album": "400 - EP",
+      "artwork": "https://is1-ssl.mzstatic.com/image/thumb/Music113/v4/ad/fe/f1/adfef1e9-cf7f-f317-3aaa-0b881c59cdc6/4935228989751_cover.jpg/600x600bb.jpg",
+      "why": "Nujabes' lead MC, solo album"
+    },
+    {
+      "artist": "haruka nakamura",
+      "track": "lamp",
+      "album": "grace",
+      "artwork": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/34/a4/68/34a4689d-e5f4-a636-ed4e-b9025b38c040/859700644058_cover.jpg/600x600bb.jpg",
+      "why": "Japanese ambient / Nujabes-adjacent"
+    },
+    {
+      "artist": "Bonobo",
+      "track": "Kerala",
+      "album": "Migration",
+      "artwork": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/be/f1/d0/bef1d063-ed73-bd7d-3899-2217762cdcda/5054429005721.png/600x600bb.jpg",
+      "why": "Downtempo, Nujabes-adjacent emotional palette"
+    },
+    {
+      "artist": "Bonobo",
+      "track": "Cirrus",
+      "album": "The North Borders",
+      "artwork": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/dd/ec/66/ddec66e4-9034-4409-f310-ee87da874487/5021392806198.png/600x600bb.jpg",
+      "why": "Downtempo instrumental"
+    },
+    {
+      "artist": "Tycho",
+      "track": "A Walk",
+      "album": "Dive",
+      "artwork": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/46/be/ed/46beed8a-5d0f-1077-cbeb-aace15e69f44/cover.jpg/600x600bb.jpg",
+      "why": "Ambient electronic, chill lineage"
+    },
+    {
+      "artist": "Tycho",
+      "track": "Awake",
+      "album": "Awake",
+      "artwork": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/7b/b8/d6/7bb8d640-dfdc-1473-3948-4060af9a3819/804297820828.jpg/600x600bb.jpg",
+      "why": "Ambient electronic"
+    },
+    {
+      "artist": "Emancipator",
+      "track": "Soon It Will Be Cold Enough to Build Fires",
+      "album": "Soon It Will Be Cold Enough",
+      "artwork": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/7d/11/0c/7d110c9d-6844-36be-75d9-126c792a10d1/859713069510_cover.tif/600x600bb.jpg",
+      "why": "Downtempo, Nujabes scene"
+    },
+    {
+      "artist": "Nightmares On Wax",
+      "track": "Les Nuits",
+      "album": "Carboot Soul",
+      "artwork": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/64/61/37/64613786-b1ec-e9ab-902c-f8b929fde3ad/0801061006136.png/600x600bb.jpg",
+      "why": "UK trip-hop / chill"
+    },
+    {
+      "artist": "tofubeats",
+      "track": "Don't Stop the Music (feat. Chisato Moritaka)",
+      "album": "First Album",
+      "artwork": "https://is1-ssl.mzstatic.com/image/thumb/Music3/v4/fc/c4/c8/fcc4c88f-2dcc-7a29-4af3-8fba637185ee/825646212682.jpg/600x600bb.jpg",
+      "why": "Japanese producer"
+    },
+    {
+      "artist": "Yogee New Waves",
+      "track": "Climax Night",
+      "album": "Paraiso",
+      "artwork": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/84/74/e0/8474e066-f19c-8874-c466-608a89a72662/paraiso_cover.jpg/600x600bb.jpg",
+      "why": "Japanese indie"
+    },
+    {
+      "artist": "cero",
+      "track": "Summer Soul",
+      "album": "Obscure Ride",
+      "artwork": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/8c/45/cd/8c45cd2f-1145-0746-4fd0-e526bf3c73a9/4538182529881.png/600x600bb.jpg",
+      "why": "Japanese indie soul"
+    },
+    {
+      "artist": "Suchmos",
+      "track": "Stay Tune",
+      "album": "The Kids",
+      "artwork": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/7f/6c/a8/7f6ca812-c4a3-2cd6-39e4-15ca6df7ab06/4538182661321_cov.jpg/600x600bb.jpg",
+      "why": "Japanese funk/hip-hop adjacent"
+    },
+    {
+      "artist": "Mitski",
+      "track": "Nobody",
+      "album": "Be the Cowboy",
+      "artwork": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/04/bc/5e/04bc5edd-006a-a5d9-0f63-effb5956e44b/656605145068.jpg/600x600bb.jpg",
+      "why": "Japanese-American indie, melancholic"
+    },
+    {
+      "artist": "Connan Mockasin",
+      "track": "Forever Dolphin Love",
+      "album": "Forever Dolphin Love",
+      "artwork": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/5e/21/bb/5e21bb02-c23e-fafe-ec35-b22bbd82c097/184923116632_cover.jpg/600x600bb.jpg",
+      "why": "Mac DeMarco-adjacent slacker pop"
+    },
+    {
+      "artist": "Whitney",
+      "track": "No Woman",
+      "album": "Light Upon the Lake",
+      "artwork": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/ac/1c/c8/ac1cc8cd-2932-9847-6193-27e2773903cf/656605033761.jpg/600x600bb.jpg",
+      "why": "Mac DeMarco-adjacent indie"
+    },
+    {
+      "artist": "HOMESHAKE",
+      "track": "Khmlwugh",
+      "album": "Fresh Air",
+      "artwork": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/c0/2e/db/c02edb14-40ac-5a09-e8d9-0ddcfef1d7b3/858458005593.jpg/600x600bb.jpg",
+      "why": "Mac DeMarco-adjacent (his ex-bandmate)"
+    },
+    {
+      "artist": "Crumb",
+      "track": "Locket",
+      "album": "Locket - EP",
+      "artwork": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/a0/b1/28/a0b128b5-4340-4f10-da1a-4d32f434557e/cover.jpg/600x600bb.jpg",
+      "why": "Indie psych close to Mac DeMarco's lane"
+    },
+    {
+      "artist": "Khruangbin",
+      "track": "Maria También",
+      "album": "Con Todo El Mundo",
+      "artwork": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/17/67/2e/17672e3b-9d01-2d5e-9b43-38f44b40f654/656605145365.jpg/600x600bb.jpg",
+      "why": "Instrumental groove, broad appeal"
+    },
+    {
+      "artist": "Steve Lacy",
+      "track": "Dark Red",
+      "album": "Steve Lacy's Demo - EP",
+      "artwork": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/b0/a8/e7/b0a8e748-8210-a4a5-79d3-d3449e51381a/5054526102712_1.jpg/600x600bb.jpg",
+      "why": "Bieber/SZA-adjacent modern R&B"
+    },
+    {
+      "artist": "Daniel Caesar",
+      "track": "Best Part (Live)",
+      "album": "Up Next Live From Apple Covent Garden - EP",
+      "artwork": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/6e/4f/69/6e4f69f4-a732-256d-bf23-f5245ab174bd/859734199319.jpg/600x600bb.jpg",
+      "why": "SZA-adjacent R&B"
+    }
+  ],
+  "not_on_itunes": [
+    {
+      "artist": "Uyama Hiroto",
+      "track": "Free Stylin' Sailor",
+      "why": "Nujabes' main collaborator, solo work"
+    },
+    {
+      "artist": "Uyama Hiroto",
+      "track": "A Forest of Pianos",
+      "why": "Nujabes' main collaborator, solo work"
+    },
+    {
+      "artist": "Fat Jon",
+      "track": "Lightweight Heavyweight",
+      "why": "Samurai Champloo co-producer"
+    },
+    {
+      "artist": "Fat Jon",
+      "track": "Repetition Defeats the Purpose",
+      "why": "Samurai Champloo co-producer"
+    },
+    {
+      "artist": "Force Of Nature",
+      "track": "Battlecry",
+      "why": "Samurai Champloo OST"
+    },
+    {
+      "artist": "Tsutchie",
+      "track": "San Francisco",
+      "why": "Samurai Champloo OST"
+    },
+    {
+      "artist": "Substantial",
+      "track": "Suspended Animation",
+      "why": "Nujabes vocalist solo"
+    },
+    {
+      "artist": "Funky DL",
+      "track": "Going On a Journey",
+      "why": "Nujabes-era UK hip-hop"
+    },
+    {
+      "artist": "Cradle",
+      "track": "Aenema",
+      "why": "Japanese hip-hop / Nujabes-adjacent label-mate"
+    },
+    {
+      "artist": "Cise Starr",
+      "track": "Reborn",
+      "why": "CYNE rapper, on Nujabes' Feather"
+    },
+    {
+      "artist": "Mocky",
+      "track": "Time to Go",
+      "why": "Producer's instrumental side"
+    },
+    {
+      "artist": "Lamp",
+      "track": "ひろがる空に",
+      "why": "Japanese indie band — bossa lineage"
+    },
+    {
+      "artist": "Frank Ocean",
+      "track": "Sweet Life",
+      "why": "SZA-adjacent R&B introspection"
+    },
+    {
+      "artist": "Frank Ocean",
+      "track": "Nights",
+      "why": "SZA-adjacent R&B introspection"
+    }
+  ],
+  "already_owned": []
+}

@@ -353,6 +353,28 @@ section { position: relative; }
   overflow: hidden;
   box-shadow: var(--shadow-card);
 }
+/* Album-thumb + title block. Thumb sits left of track-name + artist
+   so the card reads as a single editorial unit (cover · title · who)
+   rather than a stack. The translucent inner ring defines the cover
+   against the coral surface so dark/photographic art doesn't bleed. */
+.now-card__head {
+  display: flex;
+  align-items: center;
+  gap: var(--s-md);
+  margin: 0 0 var(--s-md);
+}
+.now-thumb {
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+  border-radius: var(--r-xs);
+  object-fit: cover;
+  display: block;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--on-primary) 22%, transparent),
+              0 4px 14px rgba(0, 0, 0, 0.12);
+}
+.now-card__title { min-width: 0; }
+
 .now-card .track-name {
   position: relative;
   font-family: var(--ff-display);
@@ -366,7 +388,7 @@ section { position: relative; }
   position: relative;
   font: 500 16px/1.4 var(--ff-body);
   color: var(--on-primary);
-  margin: 0 0 var(--s-md);
+  margin: 0;
 }
 .now-card .footnote {
   position: relative;
@@ -453,6 +475,20 @@ section { position: relative; }
   text-transform: uppercase;
   color: var(--muted);
   margin-left: 4px;
+}
+
+/* top-tracks variant: insert a small album thumb between rank-num and text */
+#top-tracks-list .rank-row {
+  grid-template-columns: 56px 44px 1fr auto;
+}
+.rank-thumb {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--r-xs);
+  background: var(--surface-soft);
+  display: block;
+  object-fit: cover;
+  box-shadow: 0 0 0 1px var(--hairline-soft);
 }
 
 /* highlight rows */
@@ -782,11 +818,11 @@ section { position: relative; }
 }
 .ghost-row {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: 56px 1fr auto;
   gap: var(--s-md);
   padding: var(--s-md) 0;
   border-bottom: 1px solid var(--hairline-soft);
-  align-items: baseline;
+  align-items: center;
 }
 .ghost-row:nth-child(-n+2) {
   border-top: 1px solid var(--hairline);
@@ -797,6 +833,18 @@ section { position: relative; }
 .ghost-row__name { font: 500 15px/1.4 var(--ff-body); color: var(--ink); }
 .ghost-row__name small { font: 400 13px/1.4 var(--ff-body); color: var(--muted); display: block; margin-top: 2px; }
 .ghost-row__age { font: 500 12px/1 var(--ff-body); letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+.ghost-thumb {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--r-xs);
+  background: var(--surface-soft);
+  display: block;
+  object-fit: cover;
+  box-shadow: 0 0 0 1px var(--hairline-soft);
+  filter: grayscale(0.35) opacity(0.78);
+  transition: filter .3s ease;
+}
+.ghost-row:hover .ghost-thumb { filter: none; }
 
 /* ============================================================
    S5 — GEOGRAPHY (globe.gl)
@@ -836,6 +884,24 @@ section { position: relative; }
 
 #globe { width: 100%; height: 100%; cursor: grab; }
 #globe:active { cursor: grabbing; }
+
+/* WebGL unavailable — graceful fallback so S5 still reads. The
+   geo-stage already centers its child; we just give the empty
+   container a humble note instead of a missing sphere. */
+#globe.is-fallback {
+  cursor: default;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--s-xl);
+}
+#globe.is-fallback::before {
+  content: "Globe rendering requires WebGL. Enable hardware acceleration in your browser to see it — the country narrative on the right is unaffected.";
+  text-align: center;
+  color: var(--muted);
+  font: 400 14px/1.6 var(--ff-body);
+  max-width: 36ch;
+}
 
 .geo-narrative { display: flex; flex-direction: column; gap: var(--s-md); padding-bottom: var(--s-sec); }
 .country-card {
@@ -1040,7 +1106,7 @@ section { position: relative; }
 }
 .track-row {
   display: grid;
-  grid-template-columns: 24px 1fr auto;
+  grid-template-columns: 24px 40px 1fr auto;
   gap: var(--s-md);
   align-items: center;
   padding: var(--s-sm) 0;
@@ -1050,6 +1116,28 @@ section { position: relative; }
   display: contents;
   cursor: pointer;
 }
+.track-thumb {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--r-xs);
+  background: var(--surface-soft);
+  display: block;
+  object-fit: cover;
+  box-shadow: 0 0 0 1px var(--hairline-soft);
+}
+/* Recent Vein's thumbs are click-through links to Apple Music. The
+   hover ring tells the reader "this leads somewhere" — we don't add
+   it to library-track thumbs since those are not clickable. */
+a.track-thumb-link {
+  display: block;
+  line-height: 0;
+  border-radius: var(--r-xs);
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+a.track-thumb-link:hover .track-thumb {
+  box-shadow: 0 0 0 2px var(--primary);
+}
+a.track-thumb-link:hover { transform: translateY(-1px); }
 .track-row input[type="checkbox"] {
   appearance: none;
   -webkit-appearance: none;
@@ -1263,8 +1351,13 @@ section { position: relative; }
       </div>
 
       <aside class="now-card reveal delay-1" aria-label="Most recently added">
-        <h2 class="track-name" id="recent-name">Chamber of Reflection</h2>
-        <p class="track-artist" id="recent-artist">Mac DeMarco</p>
+        <div class="now-card__head">
+          <img class="now-thumb" src="https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/4b/5c/83/4b5c833d-2160-bc68-0905-5b91d2b6732a/817949019495.jpg/600x600bb.jpg" alt="" loading="lazy">
+          <div class="now-card__title">
+            <h2 class="track-name" id="recent-name">Chamber of Reflection</h2>
+            <p class="track-artist" id="recent-artist">Mac DeMarco</p>
+          </div>
+        </div>
         <p class="footnote">
           Added <em id="recent-when">May 2026</em>. Right before it: <em>Save the Day</em> by SZA,
           and a 26-track plunge into <em>Nujabes</em> — a Japanese producer who has been gone since 2010.
@@ -1581,16 +1674,16 @@ section { position: relative; }
     {"artist":"Herb Alpert &amp; The Tijuana Brass","plays":138,"highlight":""}
   ],
   "topTracks": [
-    {"name":"Golden","artist":"Harry Styles","plays":36},
-    {"name":"Watermelon Sugar","artist":"Harry Styles","plays":33},
-    {"name":"Adore You","artist":"Harry Styles","plays":33},
-    {"name":"Under Pressure (feat. David Bowie)","artist":"Queen","plays":32},
-    {"name":"I Want To Break Free","artist":"Queen","plays":31},
-    {"name":"Lights Up","artist":"Harry Styles","plays":29},
-    {"name":"おもかげ (produced by Vaundy)","artist":"milet, Aimer &amp; Lilas Ikuta","plays":27},
-    {"name":"Snowman","artist":"Sia Furler","plays":27},
-    {"name":"Velvet Motel","artist":"Eiichi Otaki","plays":26},
-    {"name":"カナリア諸島にて","artist":"Eiichi Otaki","plays":26}
+    {"name":"Golden","artist":"Harry Styles","plays":36,"artwork":"https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/2b/c4/c9/2bc4c9d4-3bc6-ab13-3f71-df0b89b173de/886448022213.jpg/600x600bb.jpg"},
+    {"name":"Watermelon Sugar","artist":"Harry Styles","plays":33,"artwork":"https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/2b/c4/c9/2bc4c9d4-3bc6-ab13-3f71-df0b89b173de/886448022213.jpg/600x600bb.jpg"},
+    {"name":"Adore You","artist":"Harry Styles","plays":33,"artwork":"https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/2b/c4/c9/2bc4c9d4-3bc6-ab13-3f71-df0b89b173de/886448022213.jpg/600x600bb.jpg"},
+    {"name":"Under Pressure (feat. David Bowie)","artist":"Queen","plays":32,"artwork":"https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/04/96/71/04967171-a370-df71-c632-82ebba719c97/14DMGIM05609.rgb.jpg/600x600bb.jpg"},
+    {"name":"I Want To Break Free","artist":"Queen","plays":31,"artwork":"https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/b7/fe/49/b7fe491a-974c-d792-c430-f80ac605b423/14DMGIM05556.rgb.jpg/600x600bb.jpg"},
+    {"name":"Lights Up","artist":"Harry Styles","plays":29,"artwork":"https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/2b/c4/c9/2bc4c9d4-3bc6-ab13-3f71-df0b89b173de/886448022213.jpg/600x600bb.jpg"},
+    {"name":"おもかげ (produced by Vaundy)","artist":"milet, Aimer &amp; Lilas Ikuta","plays":27,"artwork":"https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/ec/1d/a0/ec1da08d-502e-9d7e-10d5-2dd301a0314f/4547366542912.jpg/600x600bb.jpg"},
+    {"name":"Snowman","artist":"Sia Furler","plays":27,"artwork":"https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/85/c3/21/85c32113-1c4c-571c-7602-88f568d8081c/075679861016.jpg/600x600bb.jpg"},
+    {"name":"Velvet Motel","artist":"Eiichi Otaki","plays":26,"artwork":"https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/3f/06/49/3f0649cf-8943-3842-d718-f3dff208aca3/4547366498417.jpg/600x600bb.jpg"},
+    {"name":"カナリア諸島にて","artist":"Eiichi Otaki","plays":26,"artwork":"https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/3f/06/49/3f0649cf-8943-3842-d718-f3dff208aca3/4547366498417.jpg/600x600bb.jpg"}
   ],
   "timeline": [
     {"month":"2020-11","year":"2020","title":"K-On! and Love Live! arrive together","note":"放課後ティータイム enters at 24 tracks; μ’s at 8. The library begins with a season already underway.","pills":["Anime","55 added"]},
@@ -1622,14 +1715,14 @@ section { position: relative; }
     {"month":"2025-09","year":"2025","title":"Justin Bieber — DAISIES","note":"26 plays. The highest-played recent addition in the entire library.","pills":["Pop","#1 in 3yr"]}
   ],
   "ghostTracks": [
-    {"name":"放課後ティータイム","artist":"放課後ティータイム","yearsOwned":5.5,"genre":"Anime"},
-    {"name":"ふわふわ時間 (#23 Mix)","artist":"放課後ティータイム","yearsOwned":5.5,"genre":"Anime"},
-    {"name":"カレーのちライス","artist":"放課後ティータイム","yearsOwned":5.5,"genre":"Anime"},
-    {"name":"My Soul, Your Beats!","artist":"LiSA","yearsOwned":5.4,"genre":"Anime"},
-    {"name":"紅蓮の弓矢","artist":"Linked Horizon","yearsOwned":5.3,"genre":"Anime"},
-    {"name":"Snow halation","artist":"μ’s","yearsOwned":5.4,"genre":"Anime"},
-    {"name":"Don’t say lazy","artist":"放課後ティータイム","yearsOwned":5.5,"genre":"Anime"},
-    {"name":"Cagayake! GIRLS","artist":"放課後ティータイム","yearsOwned":5.5,"genre":"Anime"}
+    {"name":"放課後ティータイム","artist":"放課後ティータイム","yearsOwned":5.5,"genre":"Anime","artwork":"https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/1f/4e/c7/1f4ec74e-53e5-f6da-9edd-04c003d55c95/mzi.ukjnjknz.png/600x600bb.jpg"},
+    {"name":"ふわふわ時間 (#23 Mix)","artist":"放課後ティータイム","yearsOwned":5.5,"genre":"Anime","artwork":"https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/4c/b5/dc/4cb5dc1b-ff8f-f3f6-a38c-4e9170d821b5/mzi.ghthbcgp.jpg/600x600bb.jpg"},
+    {"name":"カレーのちライス","artist":"放課後ティータイム","yearsOwned":5.5,"genre":"Anime","artwork":"https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/4c/b5/dc/4cb5dc1b-ff8f-f3f6-a38c-4e9170d821b5/mzi.ghthbcgp.jpg/600x600bb.jpg"},
+    {"name":"My Soul, Your Beats!","artist":"LiSA","yearsOwned":5.4,"genre":"Anime","artwork":"https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/bc/89/c3/bc89c324-3768-818e-89c3-b83f298a0ac9/4933032006183_cover.png/600x600bb.jpg"},
+    {"name":"紅蓮の弓矢","artist":"Linked Horizon","yearsOwned":5.3,"genre":"Anime","artwork":"https://is1-ssl.mzstatic.com/image/thumb/Music/v4/50/50/b3/5050b320-cd45-2ad7-b1b2-1b9b473d2475/PCSP_01397_itunes.png/600x600bb.jpg"},
+    {"name":"Snow halation","artist":"μ’s","yearsOwned":5.4,"genre":"Anime","artwork":"https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/83/21/a9/8321a915-dcfd-b8fd-0606-84805da604c4/020068_J.jpg/600x600bb.jpg"},
+    {"name":"Don’t say lazy","artist":"放課後ティータイム","yearsOwned":5.5,"genre":"Anime","artwork":"https://is1-ssl.mzstatic.com/image/thumb/Music/e6/86/5b/mzi.jpryyyqa.png/600x600bb.jpg"},
+    {"name":"Cagayake! GIRLS","artist":"放課後ティータイム","yearsOwned":5.5,"genre":"Anime","artwork":"https://is1-ssl.mzstatic.com/image/thumb/Music/e6/86/5b/mzi.jpryyyqa.png/600x600bb.jpg"}
   ],
   "countries": [
     {
@@ -1697,46 +1790,46 @@ section { position: relative; }
   "playlists": {
     "forgotten-awakening": {
       "title": "Forgotten Awakening",
-      "desc": "Eight tracks you brought home and never opened. Curated to skip the 2020 anime binge that no longer fits.",
+      "desc": "Eight tracks that have been on your shelf 5+ years and either never opened or briefly tried then forgotten. Drawn straight from your library's playCount data — nothing from the K-On / Love Live anime binge already over-represented elsewhere.",
       "tracks": [
-        {"name":"カナリア諸島にて","artist":"Eiichi Otaki"},
-        {"name":"Velvet Motel","artist":"Eiichi Otaki"},
-        {"name":"真夜中のドア / Stay With Me","artist":"松原みき"},
-        {"name":"Sanctuary Ship","artist":"Nujabes"},
-        {"name":"Tinted Eyes","artist":"Nujabes"},
-        {"name":"夜に駆ける","artist":"YOASOBI"},
-        {"name":"アイドル","artist":"YOASOBI"},
-        {"name":"Plastic Love","artist":"竹内まりや"}
+        {"name":"Koi","artist":"星野源","artwork":"https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/bd/a2/fd/bda2fd49-c3cc-af75-d435-9d1e57de5759/VEATP-33775.jpg/600x600bb.jpg"},
+        {"name":"心做し","artist":"majiko","artwork":"https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/bd/8b/76/bd8b76ea-22b4-e327-18c6-62264dd7b359/QWCE_00400_itunes.png/600x600bb.jpg"},
+        {"name":"悲しみの向こう側","artist":"Aimer","artwork":"https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/ef/2c/67/ef2c6700-7ea8-eded-15e7-4a377992ce45/4547366464412.jpg/600x600bb.jpg"},
+        {"name":"Kaikai Kitan","artist":"Eve","artwork":"https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/cb/e7/4a/cbe74ac2-3dba-c282-5be6-5cc1c71ccf82/4988061912912.jpg/600x600bb.jpg"},
+        {"name":"The Sound of Silence","artist":"Simon &amp; Garfunkel","artwork":"https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/f9/8c/fa/f98cfa9e-282b-8a4f-33bd-ff3de9269963/074640926921.jpg/600x600bb.jpg"},
+        {"name":"Oh Santa! (feat. Ariana Grande &amp; Jennifer Hudson)","artist":"Mariah Carey","artwork":"https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/a2/2e/30/a22e30d1-d843-2713-110e-8c78a04e59e3/886448926689.jpg/600x600bb.jpg"},
+        {"name":"Hello","artist":"Adele","artwork":"https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/08/8c/24/088c2405-2e33-801b-5c38-e967f2c01e69/191404113974.png/600x600bb.jpg"},
+        {"name":"もぎゅっと\"love\"で接近中!","artist":"μ’s","artwork":"https://is1-ssl.mzstatic.com/image/thumb/Music128/v4/7c/ab/f0/7cabf08b-5aa6-bffc-87e0-162eda599ace/021830_J.jpg/600x600bb.jpg"}
       ]
     },
     "recent-vein": {
       "title": "Recent Vein",
-      "desc": "Following the line you’re drawing now — Nujabes downstream into Japanese hip-hop, plus the recent SZA / Mac DeMarco coda.",
+      "desc": "Eight tracks not yet in your library — Nujabes' lineage in downtempo / lo-fi, plus the indie and modern-R&amp;B undertow downstream of Mac DeMarco and SZA. Each verified accessible on Apple Music. Click any cover to open.",
       "tracks": [
-        {"name":"Luv(sic) pt 3 (feat. Shing02)","artist":"Nujabes"},
-        {"name":"Aruarian Dance","artist":"Nujabes"},
-        {"name":"Feather (feat. Cise Starr &amp; Akin)","artist":"Nujabes"},
-        {"name":"Counting Stars (feat. Shing02)","artist":"Nomak"},
-        {"name":"Pharaoh Symbol","artist":"RHYMESTER"},
-        {"name":"Chamber of Reflection","artist":"Mac DeMarco"},
-        {"name":"Save The Day (From “Hoppers”)","artist":"SZA"},
-        {"name":"DAISIES","artist":"Justin Bieber"}
+        {"name":"400 (Vocal)","artist":"Shing02","artwork":"https://is1-ssl.mzstatic.com/image/thumb/Music113/v4/ad/fe/f1/adfef1e9-cf7f-f317-3aaa-0b881c59cdc6/4935228989751_cover.jpg/600x600bb.jpg","appleUrl":"https://music.apple.com/us/album/400-vocal/1465862499?i=1465862504"},
+        {"name":"lamp","artist":"haruka nakamura","artwork":"https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/34/a4/68/34a4689d-e5f4-a636-ed4e-b9025b38c040/859700644058_cover.jpg/600x600bb.jpg","appleUrl":"https://music.apple.com/us/album/lamp/1742659050?i=1742659619"},
+        {"name":"Kerala","artist":"Bonobo","artwork":"https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/be/f1/d0/bef1d063-ed73-bd7d-3899-2217762cdcda/5054429005721.png/600x600bb.jpg","appleUrl":"https://music.apple.com/us/album/kerala/1169245868?i=1169246072"},
+        {"name":"Awake","artist":"Tycho","artwork":"https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/7b/b8/d6/7bb8d640-dfdc-1473-3948-4060af9a3819/804297820828.jpg/600x600bb.jpg","appleUrl":"https://music.apple.com/us/album/awake/793928184?i=793928278"},
+        {"name":"Stay Tune","artist":"Suchmos","artwork":"https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/7f/6c/a8/7f6ca812-c4a3-2cd6-39e4-15ca6df7ab06/4538182661321_cov.jpg/600x600bb.jpg","appleUrl":"https://music.apple.com/us/album/stay-tune/1188914825?i=1188915173"},
+        {"name":"Forever Dolphin Love","artist":"Connan Mockasin","artwork":"https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/b4/12/0b/b4120bd5-ca8a-c665-b6bd-48a5d630e6ba/184923137927_cover.jpg/600x600bb.jpg","appleUrl":"https://music.apple.com/us/album/forever-dolphin-love/1796422652?i=1796423127"},
+        {"name":"Dark Red","artist":"Steve Lacy","artwork":"https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/b0/a8/e7/b0a8e748-8210-a4a5-79d3-d3449e51381a/5054526102712_1.jpg/600x600bb.jpg","appleUrl":"https://music.apple.com/us/album/dark-red/1207820151?i=1207820258"},
+        {"name":"Maria También","artist":"Khruangbin","artwork":"https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/17/67/2e/17672e3b-9d01-2d5e-9b43-38f44b40f654/656605145365.jpg/600x600bb.jpg","appleUrl":"https://music.apple.com/us/album/maria-tambi%C3%A9n/1299241642?i=1299241645"}
       ]
     },
     "obsession-replay": {
       "title": "Obsession Replay",
       "desc": "Your ten most-replayed tracks, restored to a single sitting. The library’s loudest signals, in order.",
       "tracks": [
-        {"name":"Golden","artist":"Harry Styles"},
-        {"name":"Watermelon Sugar","artist":"Harry Styles"},
-        {"name":"Adore You","artist":"Harry Styles"},
-        {"name":"Under Pressure (feat. David Bowie)","artist":"Queen"},
-        {"name":"I Want To Break Free","artist":"Queen"},
-        {"name":"Lights Up","artist":"Harry Styles"},
-        {"name":"おもかげ (produced by Vaundy)","artist":"milet, Aimer &amp; Lilas Ikuta"},
-        {"name":"Snowman","artist":"Sia Furler"},
-        {"name":"Velvet Motel","artist":"Eiichi Otaki"},
-        {"name":"カナリア諸島にて","artist":"Eiichi Otaki"}
+        {"name":"Golden","artist":"Harry Styles","artwork":"https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/2b/c4/c9/2bc4c9d4-3bc6-ab13-3f71-df0b89b173de/886448022213.jpg/600x600bb.jpg"},
+        {"name":"Watermelon Sugar","artist":"Harry Styles","artwork":"https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/2b/c4/c9/2bc4c9d4-3bc6-ab13-3f71-df0b89b173de/886448022213.jpg/600x600bb.jpg"},
+        {"name":"Adore You","artist":"Harry Styles","artwork":"https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/2b/c4/c9/2bc4c9d4-3bc6-ab13-3f71-df0b89b173de/886448022213.jpg/600x600bb.jpg"},
+        {"name":"Under Pressure (feat. David Bowie)","artist":"Queen","artwork":"https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/04/96/71/04967171-a370-df71-c632-82ebba719c97/14DMGIM05609.rgb.jpg/600x600bb.jpg"},
+        {"name":"I Want To Break Free","artist":"Queen","artwork":"https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/b7/fe/49/b7fe491a-974c-d792-c430-f80ac605b423/14DMGIM05556.rgb.jpg/600x600bb.jpg"},
+        {"name":"Lights Up","artist":"Harry Styles","artwork":"https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/2b/c4/c9/2bc4c9d4-3bc6-ab13-3f71-df0b89b173de/886448022213.jpg/600x600bb.jpg"},
+        {"name":"おもかげ (produced by Vaundy)","artist":"milet, Aimer &amp; Lilas Ikuta","artwork":"https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/ec/1d/a0/ec1da08d-502e-9d7e-10d5-2dd301a0314f/4547366542912.jpg/600x600bb.jpg"},
+        {"name":"Snowman","artist":"Sia Furler","artwork":"https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/85/c3/21/85c32113-1c4c-571c-7602-88f568d8081c/075679861016.jpg/600x600bb.jpg"},
+        {"name":"Velvet Motel","artist":"Eiichi Otaki","artwork":"https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/3f/06/49/3f0649cf-8943-3842-d718-f3dff208aca3/4547366498417.jpg/600x600bb.jpg"},
+        {"name":"カナリア諸島にて","artist":"Eiichi Otaki","artwork":"https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/3f/06/49/3f0649cf-8943-3842-d718-f3dff208aca3/4547366498417.jpg/600x600bb.jpg"}
       ]
     }
   }
@@ -1793,8 +1886,12 @@ const DATA = JSON.parse(document.getElementById('DATA').textContent);
   DATA.topTracks.forEach((t, i) => {
     const row = document.createElement('div');
     row.className = 'rank-row' + (t.artist === 'Harry Styles' ? ' is-highlight' : '');
+    const thumb = t.artwork
+      ? `<img class="rank-thumb" src="${t.artwork}" alt="" loading="lazy">`
+      : `<span class="rank-thumb" aria-hidden="true"></span>`;
     row.innerHTML = `
       <span class="rank-num">${String(i+1).padStart(2,'0')}</span>
+      ${thumb}
       <span>
         <span class="primary-line">${t.name}</span>
         <span class="secondary-line">${t.artist}</span>
@@ -1871,7 +1968,11 @@ const DATA = JSON.parse(document.getElementById('DATA').textContent);
   DATA.ghostTracks.forEach(t => {
     const row = document.createElement('div');
     row.className = 'ghost-row';
+    const thumb = t.artwork
+      ? `<img class="ghost-thumb" src="${t.artwork}" alt="" loading="lazy">`
+      : `<span class="ghost-thumb" aria-hidden="true"></span>`;
     row.innerHTML = `
+      ${thumb}
       <div class="ghost-row__name">${t.name}<small>${t.artist} · ${t.genre}</small></div>
       <div class="ghost-row__age">${t.yearsOwned.toFixed(1)} yrs · unplayed</div>
     `;
@@ -1996,6 +2097,29 @@ function featureMatchesCode(feature, code) {
 function initGlobe() {
   const container = document.getElementById('globe');
   if (!container || typeof Globe === 'undefined') return;
+
+  // Probe WebGL up front. If the browser can't give us a context
+  // (hardware acceleration disabled, GPU sandboxed, headless without
+  // swiftshader, etc.), bail with a quiet fallback so the rest of
+  // the inline script — S7 playlists, reveal observers — still runs.
+  try {
+    const probe = document.createElement('canvas');
+    const ctx = probe.getContext('webgl2') || probe.getContext('webgl');
+    if (!ctx) throw new Error('no WebGL context');
+  } catch (e) {
+    console.warn('[report] WebGL unavailable — S5 globe will not render. Enable hardware acceleration in your browser to see it.', e);
+    container.classList.add('is-fallback');
+    return;
+  }
+
+  try { return initGlobeUnsafe(container); }
+  catch (e) {
+    console.warn('[report] Globe init threw after WebGL probe passed. Falling back without sphere.', e);
+    container.classList.add('is-fallback');
+  }
+}
+
+function initGlobeUnsafe(container) {
   const colors = getGlobeColors();
 
   GLOBE = Globe()(container)
@@ -2087,16 +2211,25 @@ function initGlobe() {
         </div>
       </div>
       <div class="track-list">
-        ${pl.tracks.map((t, i) => `
+        ${pl.tracks.map((t, i) => {
+          const imgTag = t.artwork
+            ? `<img class="track-thumb" src="${t.artwork}" alt="" loading="lazy">`
+            : `<span class="track-thumb" aria-hidden="true"></span>`;
+          const thumb = t.appleUrl
+            ? `<a class="track-thumb-link" href="${t.appleUrl}" target="_blank" rel="noopener" aria-label="Open ${t.name} on Apple Music">${imgTag}</a>`
+            : imgTag;
+          return `
           <div class="track-row">
             <input type="checkbox" id="${key}-${i}" data-key="${key}" checked>
+            ${thumb}
             <label for="${key}-${i}" class="track-row__main" style="display:flex;flex-direction:column;cursor:pointer;">
               <span class="track-row__name">${t.name}</span>
               <span class="track-row__artist">${t.artist}</span>
             </label>
             <span class="track-row__meta">${String(i+1).padStart(2,'0')}</span>
           </div>
-        `).join('')}
+        `;
+        }).join('')}
       </div>
       <div class="playlist-actions">
         <button class="btn-primary" data-action="generate" data-key="${key}">Generate AppleScript</button>
@@ -2171,41 +2304,65 @@ function initGlobe() {
   }
 
   function buildAppleScript(title, tracks) {
+    // Split tracks: those in user's library (resolve by name+artist) vs.
+    // recommendations not yet in library (each has an Apple Music URL).
+    // Library tracks get duplicated into a new playlist; recommendations
+    // are opened in Apple Music for the user to tap "+" on.
+    const libraryTracks = tracks.filter(t => !t.appleUrl);
+    const recoTracks = tracks.filter(t => t.appleUrl);
     const stamped = `${title} · ${new Date().toISOString().slice(0,10)}`;
     const lines = [];
+
     lines.push('-- Apple Music playlist generator');
     lines.push(`-- ${stamped}`);
-    lines.push(`-- ${tracks.length} track${tracks.length===1?'':'s'}`);
+    lines.push(`-- ${tracks.length} track${tracks.length===1?'':'s'}` +
+      (recoTracks.length ? ` (${recoTracks.length} from Apple Music · ${libraryTracks.length} from library)` : ''));
     lines.push('');
     lines.push('tell application "Music"');
     lines.push('  activate');
-    lines.push(`  set plName to "${escAS(stamped)}"`);
-    lines.push('  if (exists user playlist plName) then');
-    lines.push('    set targetPlaylist to user playlist plName');
-    lines.push('    try');
-    lines.push('      delete every track of targetPlaylist');
-    lines.push('    end try');
-    lines.push('  else');
-    lines.push('    set targetPlaylist to make new user playlist with properties {name:plName}');
-    lines.push('  end if');
-    lines.push('');
-    lines.push('  set notFound to {}');
-    tracks.forEach(t => {
-      lines.push(`  -- ${t.name} — ${t.artist.replace(/&amp;/g,'&')}`);
-      lines.push(`  set trackName to "${escAS(t.name.replace(/&amp;/g,'&'))}"`);
-      lines.push(`  set artistName to "${escAS(t.artist.replace(/&amp;/g,'&'))}"`);
-      lines.push('  set foundTracks to (every track of library playlist 1 whose name is trackName and artist is artistName)');
-      lines.push('  if (count of foundTracks) > 0 then');
-      lines.push('    duplicate (item 1 of foundTracks) to targetPlaylist');
+
+    if (libraryTracks.length > 0) {
+      lines.push(`  set plName to "${escAS(stamped)}"`);
+      lines.push('  if (exists user playlist plName) then');
+      lines.push('    set targetPlaylist to user playlist plName');
+      lines.push('    try');
+      lines.push('      delete every track of targetPlaylist');
+      lines.push('    end try');
       lines.push('  else');
-      lines.push('    set end of notFound to trackName & " — " & artistName');
+      lines.push('    set targetPlaylist to make new user playlist with properties {name:plName}');
       lines.push('  end if');
-    });
-    lines.push('');
-    lines.push('  reveal targetPlaylist');
-    lines.push('  if (count of notFound) > 0 then');
-    lines.push('    display dialog "Created playlist with " & (count of tracks of targetPlaylist) & " tracks. " & (count of notFound) & " not found in library."');
-    lines.push('  end if');
+      lines.push('');
+      lines.push('  set notFound to {}');
+      libraryTracks.forEach(t => {
+        lines.push(`  -- ${t.name} — ${t.artist.replace(/&amp;/g,'&')}`);
+        lines.push(`  set trackName to "${escAS(t.name.replace(/&amp;/g,'&'))}"`);
+        lines.push(`  set artistName to "${escAS(t.artist.replace(/&amp;/g,'&'))}"`);
+        lines.push('  set foundTracks to (every track of library playlist 1 whose name is trackName and artist is artistName)');
+        lines.push('  if (count of foundTracks) > 0 then');
+        lines.push('    duplicate (item 1 of foundTracks) to targetPlaylist');
+        lines.push('  else');
+        lines.push('    set end of notFound to trackName & " — " & artistName');
+        lines.push('  end if');
+      });
+      lines.push('');
+      lines.push('  reveal targetPlaylist');
+      lines.push('  if (count of notFound) > 0 then');
+      lines.push('    display dialog "Added " & (count of tracks of targetPlaylist) & " tracks. " & (count of notFound) & " not found in library."');
+      lines.push('  end if');
+    }
+
+    if (recoTracks.length > 0) {
+      lines.push('');
+      lines.push('  -- Apple Music recommendations: opens each track in Music.');
+      lines.push('  -- Tap the "+" on each page to add it to your library, then');
+      lines.push('  -- drag from the sidebar into a playlist of your choice.');
+      recoTracks.forEach(t => {
+        lines.push(`  -- ${t.name} — ${t.artist.replace(/&amp;/g,'&')}`);
+        lines.push(`  open location "${t.appleUrl}"`);
+        lines.push('  delay 0.8');
+      });
+    }
+
     lines.push('end tell');
     return lines.join('\n');
   }
