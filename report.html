@@ -349,12 +349,15 @@ section { position: relative; }
   color: var(--muted);
 }
 
-/* hero illustration card — a "now-playing"-style card */
+/* hero illustration card — coral full-bleed.
+   Same surface treatment as the S4 .coral-callout: coral background,
+   on-primary text, secondary text at 80% transparency. */
 .now-card {
-  background: var(--surface-card);
+  background: var(--primary);
+  color: var(--on-primary);
   border-radius: var(--r-xl);
   padding: var(--s-xl);
-  border: 1px solid var(--hairline-soft);
+  border: 0;
   position: relative;
   overflow: hidden;
   box-shadow: var(--shadow-card);
@@ -367,38 +370,38 @@ section { position: relative; }
   font: 500 12px/1 var(--ff-body);
   letter-spacing: 1.5px;
   text-transform: uppercase;
-  color: var(--muted);
+  color: color-mix(in srgb, var(--on-primary) 80%, transparent);
   margin-bottom: var(--s-lg);
 }
 .now-card .label::before {
   content: "";
   width: 6px; height: 6px; border-radius: 50%;
-  background: var(--primary);
+  background: var(--on-primary);
 }
 .now-card .track-name {
   position: relative;
   font-family: var(--ff-display);
   font-size: clamp(26px, 3vw, 36px);
   line-height: 1.12;
-  color: var(--ink);
+  color: var(--on-primary);
   letter-spacing: -0.4px;
   margin: 0 0 var(--s-xs);
 }
 .now-card .track-artist {
   position: relative;
   font: 500 16px/1.4 var(--ff-body);
-  color: var(--body-strong);
+  color: var(--on-primary);
   margin: 0 0 var(--s-lg);
 }
 .now-card .footnote {
   position: relative;
   font: 400 14px/1.55 var(--ff-body);
-  color: var(--muted);
+  color: color-mix(in srgb, var(--on-primary) 80%, transparent);
   font-style: italic;
 }
 .now-card .footnote em {
   font-style: normal;
-  color: var(--body-strong);
+  color: var(--on-primary);
   font-weight: 500;
 }
 
