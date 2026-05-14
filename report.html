@@ -562,10 +562,10 @@ section { position: relative; }
 .tl-axis__year::before {
   content: "";
   position: absolute;
-  left: -8px;
+  left: 2px;
   top: 50%;
   transform: translateY(-50%);
-  width: 9px; height: 9px;
+  width: 6px; height: 6px;
   border-radius: 50%;
   background: var(--primary);
   opacity: 0;
@@ -779,10 +779,20 @@ section { position: relative; }
   font-style: normal;
 }
 
-/* forgotten list — small ghost rows */
+/* forgotten list — small ghost rows.
+   Full-width 2-col grid below the lead/callout pair so the bottom
+   of the section uses both columns evenly instead of stacking
+   under the right-side coral callout. The top hairline is applied
+   per-column (to the first row of each) so it visually segments
+   with the column-gap, matching the per-row bottom hairlines below. */
 .ghost-list {
   margin-top: var(--s-xxl);
-  border-top: 1px solid var(--hairline);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: var(--s-xxl);
+}
+@media (max-width: 700px) {
+  .ghost-list { grid-template-columns: 1fr; }
 }
 .ghost-row {
   display: grid;
@@ -791,6 +801,12 @@ section { position: relative; }
   padding: var(--s-md) 0;
   border-bottom: 1px solid var(--hairline-soft);
   align-items: baseline;
+}
+.ghost-row:nth-child(-n+2) {
+  border-top: 1px solid var(--hairline);
+}
+@media (max-width: 700px) {
+  .ghost-row:nth-child(2) { border-top: 0; }
 }
 .ghost-row__name { font: 500 15px/1.4 var(--ff-body); color: var(--ink); }
 .ghost-row__name small { font: 400 13px/1.4 var(--ff-body); color: var(--muted); display: block; margin-top: 2px; }
@@ -1423,10 +1439,10 @@ section { position: relative; }
           </blockquote>
           <cite>Top forgotten genres · Pop 158 · J-Pop 112 · Anime 93</cite>
         </figure>
-
-        <div class="ghost-list" id="ghost-list"></div>
       </div>
     </div>
+
+    <div class="ghost-list reveal" id="ghost-list"></div>
   </div>
 </section>
 
