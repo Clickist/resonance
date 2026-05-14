@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>The Library — A Listening Profile</title>
+<title>Resonance — Listening Profile</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
 
 <style>
 /* ============================================================
@@ -269,26 +269,39 @@ section { position: relative; }
   font: 500 14px/1 var(--ff-body);
   letter-spacing: 0.2px;
 }
-.brand .spike { width: 16px; height: 16px; color: var(--ink); }
-.brand strong { font-weight: 500; }
+/* Brand wordmark: Space Grotesk 700 uppercase, approximating the
+   Styrene-family wordmark feel without the proprietary typeface.
+   Sized as a brand mark — heavier than nav copy, lighter than
+   section headlines. */
+.brand strong {
+  font-family: "Space Grotesk", var(--ff-body);
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
 
 .nav-actions {
   display: flex;
   align-items: center;
   gap: var(--s-xs);
 }
+/* Bare icon button — no chrome. Keeps a 36×36 hit target so it's
+   still tappable on touch, but visually it's just the sun/moon glyph.
+   Hover lifts the icon color, not the background. */
 .theme-toggle {
   width: 36px; height: 36px;
-  border-radius: var(--r-pill);
-  border: 1px solid var(--hairline);
-  background: var(--canvas);
-  color: var(--ink);
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  padding: 0;
+  cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: background .2s ease, color .2s ease, border-color .2s ease, transform .2s ease;
+  transition: color .2s ease, transform .2s ease;
 }
-.theme-toggle:hover { transform: translateY(-1px); }
+.theme-toggle:hover { color: var(--ink); transform: translateY(-1px); }
 .theme-toggle svg { width: 16px; height: 16px; }
 .theme-toggle .sun { display: none; }
 .theme-toggle .moon { display: inline-block; }
@@ -800,16 +813,6 @@ section { position: relative; }
   letter-spacing: -0.3px;
   color: var(--on-primary);
 }
-.coral-callout cite {
-  display: block;
-  margin-top: var(--s-lg);
-  font: 500 12px/1 var(--ff-body);
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  color: color-mix(in srgb, var(--on-primary) 80%, transparent);
-  font-style: normal;
-}
-
 /* forgotten list — small ghost rows.
    Full-width 2-col grid below the lead/callout pair so the bottom
    of the section uses both columns evenly instead of stacking
@@ -1285,8 +1288,26 @@ a.track-thumb-link:hover { transform: translateY(-1px); }
   flex-wrap: wrap;
 }
 .footer .brand { color: var(--code-fg); }
-.footer .brand .spike { color: var(--code-fg); }
 .footer small { font: 400 13px/1.4 var(--ff-body); color: var(--code-fg-soft); }
+/* Footer meta line: copyright + social icons, right-aligned.
+   Icons start at code-fg-soft (subdued) and lift to code-fg on hover,
+   matching the theme-toggle icon-button pattern. Coral is off-budget
+   here per DESIGN.md. */
+.footer-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-md);
+}
+.footer-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px; height: 22px;
+  color: var(--code-fg-soft);
+  transition: color .2s ease, transform .2s ease;
+}
+.footer-icon svg { width: 16px; height: 16px; display: block; }
+.footer-icon:hover { color: var(--code-fg); transform: translateY(-1px); }
 
 /* utility */
 .hide-on-mobile { }
@@ -1325,11 +1346,7 @@ a.track-thumb-link:hover { transform: translateY(-1px); }
 <nav class="top-nav">
   <div class="top-nav__inner">
     <a href="#hero" class="brand">
-      <svg class="spike" viewBox="0 0 24 24" aria-hidden="true">
-        <!-- Anthropic-style 4-spoke radial mark -->
-        <path fill="currentColor" d="M12 2 L13.5 9 L20 8 L14 12 L20 16 L13.5 15 L12 22 L10.5 15 L4 16 L10 12 L4 8 L10.5 9 Z"/>
-      </svg>
-      <strong>Listening Profile</strong>
+      <strong>Resonance</strong>
     </a>
     <div class="nav-actions">
       <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme" title="Toggle theme">
@@ -1528,7 +1545,6 @@ a.track-thumb-link:hover { transform: translateY(-1px); }
             放課後ティータイム, μ’s, LiSA, Linked Horizon — what carried you through one season
             never quite carried you into the next.
           </blockquote>
-          <cite>Top forgotten genres · Pop 158 · J-Pop 112 · Anime 93</cite>
         </figure>
       </div>
     </div>
@@ -1652,12 +1668,23 @@ a.track-thumb-link:hover { transform: translateY(-1px); }
 <footer class="footer">
   <div class="footer__inner">
     <div class="brand">
-      <svg class="spike" viewBox="0 0 24 24" aria-hidden="true">
-        <path fill="currentColor" d="M12 2 L13.5 9 L20 8 L14 12 L20 16 L13.5 15 L12 22 L10.5 15 L4 16 L10 12 L4 8 L10.5 9 Z"/>
-      </svg>
-      <strong>Listening Profile</strong>
+      <strong>Resonance</strong>
     </div>
-    <small>Generated <span id="gen-date">May 14, 2026</span> · 901 tracks · No tracking, no telemetry, no third parties.</small>
+    <small class="footer-meta">
+      <span>© 2026 BinaryCookie</span>
+      <!-- TODO: fill in the GitHub project URL once the repo is pushed to remote -->
+      <a class="footer-icon" href="#" target="_blank" rel="noopener" aria-label="GitHub project">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.92.58.11.79-.25.79-.56v-2c-3.2.7-3.88-1.36-3.88-1.36-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.75 1.18 1.75 1.18 1.02 1.75 2.68 1.24 3.34.95.1-.74.4-1.24.72-1.53-2.55-.29-5.24-1.27-5.24-5.66 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.04 0 0 .96-.31 3.15 1.17a10.9 10.9 0 0 1 5.74 0c2.19-1.48 3.15-1.17 3.15-1.17.62 1.58.23 2.75.11 3.04.73.8 1.18 1.82 1.18 3.07 0 4.4-2.69 5.36-5.25 5.65.41.36.78 1.06.78 2.14v3.17c0 .31.21.68.79.56C20.21 21.39 23.5 17.08 23.5 12 23.5 5.65 18.35.5 12 .5z"/>
+        </svg>
+      </a>
+      <!-- TODO: fill in the X profile URL -->
+      <a class="footer-icon" href="#" target="_blank" rel="noopener" aria-label="X profile">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77z"/>
+        </svg>
+      </a>
+    </small>
   </div>
 </footer>
 
