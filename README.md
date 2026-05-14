@@ -91,45 +91,40 @@ The rendered report contains **7 narrative sections**:
 - macOS (the extraction stage uses JXA, which is macOS-only)
 - Apple Music app with a local library
 - Python 3.9+
+- [Claude Code](https://claude.ai/code) (for the AI-powered curation and rendering stage)
 - That's it. The rendered report requires only a browser.
+
+## Install
+
+```bash
+git clone https://github.com/Clickist/resonance.git ~/.claude/skills/resonance
+```
+
+That's it. Claude Code will detect the skill on next launch. Then just type `/resonance` and Claude will handle the rest.
 
 ---
 
 ## Quick start
 
 ```bash
-# 1. Clone
-git clone https://github.com/Clickist/resonance.git
-cd resonance
+# 1. Install
+git clone https://github.com/Clickist/resonance.git ~/.claude/skills/resonance
 
-# 2. Extract your Apple Music library
-./extract_library.sh
-# → data/library.json
-
-# 3. Analyze
-python3 analyze_library.py
-# → data/analysis.json
-
-# 4. Generate your report
-#    Invoke Claude Code and say:
-#    "Fill report.example.html with my analysis.json data.
-#     Run fetch_artwork.py first for album covers.
-#     Write editorial commentary for all sections.
-#     Output as report.html."
-
-# 5. Open
-open report.html
+# 2. Open Claude Code anywhere and run:
+/resonance
 ```
 
-Or, if you have [Claude Code](https://claude.ai/code) installed, install the skill and let Claude run the entire pipeline:
+Claude will extract, analyze, fetch artwork, curate, and produce your personalized `report.html`. Open it and read.
+
+If you prefer to run the pipeline manually (without the skill):
 
 ```bash
-claude
-# > Install the Resonance skill
-# > /resonance
+./extract_library.sh          # → data/library.json
+python3 analyze_library.py     # → data/analysis.json
+python3 fetch_artwork.py       # → data/artwork.json
+# Then ask Claude to fill report.example.html with your data → report.html
+open report.html
 ```
-
-Claude will extract, analyze, curate, and produce your personalized `report.html`.
 
 ---
 

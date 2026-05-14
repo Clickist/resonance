@@ -90,45 +90,40 @@ open report.html
 - macOS(提取阶段使用 JXA,仅限 macOS)
 - Apple Music 应用,有本地资料库
 - Python 3.9+
+- [Claude Code](https://claude.ai/code)(用于 AI 策展和渲染阶段)
 - 就这些。生成的报告只需要浏览器即可查看。
+
+## 安装
+
+```bash
+git clone https://github.com/Clickist/resonance.git ~/.claude/skills/resonance
+```
+
+搞定。Claude Code 会在下次启动时检测到这个 skill。之后只需输入 `/resonance`,Claude 会自动处理其余一切。
 
 ---
 
 ## 快速开始
 
 ```bash
-# 1. 克隆
-git clone https://github.com/Clickist/resonance.git
-cd resonance
+# 1. 安装
+git clone https://github.com/Clickist/resonance.git ~/.claude/skills/resonance
 
-# 2. 提取你的 Apple Music 资料库
-./extract_library.sh
-# → data/library.json
-
-# 3. 分析
-python3 analyze_library.py
-# → data/analysis.json
-
-# 4. 生成你的报告
-#    调用 Claude Code 并说:
-#    "利用 analysis.json 数据填写 report.example.html。
-#     先运行 fetch_artwork.py 获取专辑封面。
-#     为所有章节撰写编辑评论。
-#     输出为 report.html。"
-
-# 5. 打开
-open report.html
+# 2. 在任意位置打开 Claude Code,输入:
+/resonance
 ```
 
-如果你安装了 [Claude Code](https://claude.ai/code),可以直接安装 skill 让 Claude 运行整个管道:
+Claude 会提取、分析、抓取封面、策展并生成你的个性化 `report.html`。打开即可阅读。
+
+如果你想手动运行管道(不使用 skill):
 
 ```bash
-claude
-# > 安装 Resonance skill
-# > /resonance
+./extract_library.sh          # → data/library.json
+python3 analyze_library.py     # → data/analysis.json
+python3 fetch_artwork.py       # → data/artwork.json
+# 然后让 Claude 把 report.example.html 填上你的数据 → report.html
+open report.html
 ```
-
-Claude 会提取、分析、策展并生成你的个性化 `report.html`。
 
 ---
 
