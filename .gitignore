@@ -2,3 +2,14 @@
 *.swp
 .vscode/
 node_modules/
+
+# Personal listening data — each user generates their own via the pipeline
+data/library.json
+data/analysis.json
+data/recent_vein_candidates.json
+
+# Design system reference (internal tooling, not needed by end users)
+claude_design/
+
+# Internal docs
+docs/
