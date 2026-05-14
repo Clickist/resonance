@@ -210,24 +210,6 @@ section { position: relative; }
 .section-band { padding: var(--s-sec) 0; }
 .section-band--tight { padding: calc(var(--s-sec) * 0.6) 0; }
 
-.eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--s-xs);
-  font: 500 12px/1.4 var(--ff-body);
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin-bottom: var(--s-lg);
-}
-.eyebrow::before {
-  content: "";
-  width: 6px; height: 6px;
-  background: var(--primary);
-  border-radius: 50%;
-  display: inline-block;
-}
-
 /* reveal-on-scroll */
 .reveal {
   opacity: 0;
@@ -1318,7 +1300,6 @@ section { position: relative; }
 <section id="obsession" class="section-band">
   <div class="container">
     <header class="obsession__head reveal">
-      <div class="eyebrow">Chapter 01 · The obsession archive</div>
       <h2 class="t-display-lg">Some names you played a few hundred times. Most you played once.</h2>
       <p class="t-body-md">
         Across <strong>779</strong> tracks you have ever pressed play on, the top ten artists account for
@@ -1372,7 +1353,6 @@ section { position: relative; }
 <section id="timeline" class="timeline">
   <div class="container">
     <header class="timeline__head reveal">
-      <div class="eyebrow">Chapter 02 · Diggings &amp; rabbit holes</div>
       <h2 class="t-display-lg">Six years of monthly excavations.</h2>
       <p class="t-body-md">
         Every column below is a month where something specific entered your library — a series finished, an artist found,
@@ -1418,7 +1398,6 @@ section { position: relative; }
   <div class="container">
     <div class="forgotten__grid">
       <div class="forgotten__lead reveal">
-        <div class="eyebrow">Chapter 03 · The forgotten shelf</div>
         <h2 class="t-display-lg">Some you brought home and never opened.</h2>
         <p class="t-body-md">
           <strong>117</strong> tracks have never been played, even though they’ve been in your library for over a year.
@@ -1462,7 +1441,6 @@ section { position: relative; }
 <section id="geography" class="geography">
   <div class="container">
     <header class="geography__head reveal">
-      <div class="eyebrow">Chapter 04 · Geography of taste</div>
       <h2 class="t-display-lg">You walk a line between two pop traditions.</h2>
       <p class="t-body-md">
         Of <strong>300</strong> mapped artists, <strong>113</strong> are American, <strong>56</strong> Japanese,
@@ -1494,7 +1472,6 @@ section { position: relative; }
 <section id="portrait" class="portrait">
   <div class="container-narrow portrait__inner">
     <header class="reveal">
-      <div class="eyebrow">Chapter 05 · The portrait</div>
       <h2 class="t-display-lg">A picture, drawn entirely by what you played twice.</h2>
     </header>
 
@@ -1541,7 +1518,6 @@ section { position: relative; }
 <section id="playlists" class="playlists">
   <div class="container">
     <header class="playlists__head reveal">
-      <div class="eyebrow">Chapter 06 · Three playlists</div>
       <h2 class="t-display-lg">Three doors, each leading somewhere already inside you.</h2>
       <p class="t-body-md">
         Pick the door. Edit the tracklist. Generate AppleScript and paste it into Terminal —
@@ -1622,13 +1598,13 @@ section { position: relative; }
     {"month":"2021-02","year":"2021","title":"Adele, an entire album in one sweep","note":"62 tracks added; 56 of them are hers. A focused excavation, not a discovery.","pills":["Adele","62 added"]},
     {"month":"2021-03","year":"2021","title":"Three obsessions converge","note":"Avicii, LiSA, and Utada — the highest-volume month in your library. 106 tracks.","pills":["106 added","library peak"]},
     {"month":"2021-06","year":"2021","title":"Sia Furler — the foundation goes down","note":"19 tracks added in one month. Every later high-play count for her rests on this sweep.","pills":["Sia","19 added"]},
-    {"month":"2021-07","year":"2021","title":"橘子海 — a small Taiwanese Britpop band","note":"9 tracks. The first non-mainstream Chinese-language entry in the library.","pills":["Mandopop","TW"]},
+    {"month":"2021-07","year":"2021","title":"橘子海 — a small Britpop band from Chinese Taiwan","note":"9 tracks. The first non-mainstream Chinese-language entry in the library.","pills":["Mandopop","TW"]},
     {"month":"2021-08","year":"2021","title":"Queen, in volume","note":"21 tracks. Two of them — Under Pressure, I Want to Break Free — will sit at top-of-track for years.","pills":["Queen","21 added"]},
     {"month":"2021-09","year":"2021","title":"Shania Twain returns; Aimer enters","note":"86 tracks in one month, the third-highest. Country and J-Pop on the same shelf.","pills":["86 added"]},
     {"month":"2021-10","year":"2021","title":"Aimer and Yo-Yo Ma, same week","note":"Anime soundtrack vocals meet classical chamber music. The library refuses to commit to one register.","pills":["Range"]},
     {"month":"2021-11","year":"2021","title":"Adele’s 30, day-of","note":"12 tracks added to follow the release.","pills":["Adele"]},
     {"month":"2022-03","year":"2022","title":"Molchat Doma — Belarusian post-punk","note":"4 tracks. A side door opens to Eastern European cold-wave.","pills":["BY","Post-punk"]},
-    {"month":"2022-08","year":"2022","title":"告五人 — Taiwan, again","note":"First entry; 3 tracks. They’ll come back.","pills":["Mandopop"]},
+    {"month":"2022-08","year":"2022","title":"告五人 — Chinese Taiwan, again","note":"First entry; 3 tracks. They’ll come back.","pills":["Mandopop"]},
     {"month":"2022-10","year":"2022","title":"Cyberpunk: Edgerunners OST","note":"akira kondo, Rosa Walton &amp; Hallie Coggins. The anime catalog widens into game-adjacent territory.","pills":["OST"]},
     {"month":"2022-11","year":"2022","title":"真夜中のドア sneaks in","note":"The first city-pop signal. A trickle, not a wave — yet.","pills":["City Pop"]},
     {"month":"2022-12","year":"2022","title":"Chainsaw Man — Kick Back; Sawano Hiroyuki","note":"Yonezu Kenshi and 泽野弘之 arrive on the same trigger.","pills":["Anime","J-Pop"]},
@@ -1687,7 +1663,7 @@ section { position: relative; }
       "top":[{"artist":"Avicii","plays":352,"note":"#2 artist · finite catalog"},{"artist":"Alesso &amp; Marshmello","plays":20,"note":""},{"artist":"Mike Perry","plays":13,"note":""}]
     },
     {
-      "code":"TW","name":"Taiwan","artistCount":7,
+      "code":"TW","name":"Chinese Taiwan","artistCount":7,
       "lat":23.7,"lng":121.0,
       "blurb":"A small but committed slice. 告五人 and 周杰倫 anchor the Mandopop column.",
       "top":[{"artist":"告五人","plays":55,"note":"Britpop in Mandarin"},{"artist":"周杰倫","plays":37,"note":""},{"artist":"陶喆","plays":23,"note":""}]
